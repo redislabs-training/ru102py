@@ -1,0 +1,15 @@
+name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build
+        run: docker-compose -f docker-compose.yml up -d
+      - name: Check running containers
+        run: docker ps -a
+      - name: Check logs
+        run: docker-compose logs
+      - name: Run tests
+        run: docker-compose run test make all

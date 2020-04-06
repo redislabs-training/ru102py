@@ -1,0 +1,1 @@
+from redisolar.scripts.compare_and_update import CompareAndUpdateScript

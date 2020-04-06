@@ -1,0 +1,89 @@
+from typing import Set
+
+from redisolar.dao.base import SiteGeoDaoBase
+from redisolar.dao.redis.base import RedisDaoBase
+from redisolar.models import GeoQuery
+from redisolar.models import Site
+from redisolar.schema import FlatSiteSchema
+
+CAPACITY_THRESHOLD = 0.2
+
+
+class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
+    """SiteGeoDaoRedis persists and queries Sites in Redis."""
+    def insert(self, site: Site):
+        """Insert a Site into Redis."""
+        hash_key = self.key_schema.site_hash_key(site.id)
+        self.redis.hmset(hash_key, FlatSiteSchema().dump(site))
+
+        if not site.coordinate:
+            raise ValueError("Site coordinates are required for Geo insert")
+
+        self.redis.geoadd(  # type: ignore
+            self.key_schema.site_geo_key(), site.coordinate.lng, site.coordinate.lat,
+            hash_key)
+
+    def insert_many(self, *sites: Site) -> None:
+        """Insert multiple Sites into Redis."""
+        for site in sites:
+            self.insert(site)
+
+    def find_by_id(self, site_id: int) -> Site:
+        """Find a Site by ID in Redis."""
+        hash_key = self.key_schema.site_hash_key(site_id)
+        site_hash = self.redis.hgetall(hash_key)
+        return FlatSiteSchema().load(site_hash)
+
+    def _find_by_geo(self, query: GeoQuery) -> Set[Site]:
+        sites = self.redis.georadius(  # type: ignore
+            self.key_schema.site_geo_key(), query.coordinate.lng, query.coordinate.lat,
+            query.radius, query.radius_unit.value)
+
+        return {FlatSiteSchema().load(self.redis.hgetall(hash_key)) for hash_key in sites}
+
+    def _find_by_geo_with_capacity(self, query: GeoQuery, **kwargs) -> Set[Site]:
+        # START Challenge #5
+        coord = query.coordinate
+        radius_response = self.redis.georadius(  # type: ignore
+            self.key_schema.site_geo_key(), coord.lng, coord.lat, query.radius,
+            query.radius_unit.value)
+        # END Challenge #5
+
+        sites = {
+            FlatSiteSchema().load(self.redis.hgetall(hash_key))
+            for hash_key in radius_response
+        }
+        site_ids = [site.id for site in sites]
+
+        # START Challenge #5
+        p = self.redis.pipeline(transaction=False)
+        for site in sites:
+            p.zscore(self.key_schema.capacity_ranking_key(), site.id)
+        scores = dict(zip(site_ids, reversed(p.execute())))
+        # END Challenge #5
+
+        return {
+            site
+            for site in sites if scores[site.id] and scores[site.id] > CAPACITY_THRESHOLD
+        }
+
+    def find_by_geo(self, query: GeoQuery) -> Set[Site]:
+        """Find Sites using a geographic query."""
+        if query.only_excess_capacity:
+            return self._find_by_geo_with_capacity(query)
+        return self._find_by_geo(query)
+
+    def find_all(self) -> Set[Site]:
+        """Find all Sites."""
+        keys = self.redis.zrange(self.key_schema.site_geo_key(), 0, -1)
+        sites = set()
+        p = self.redis.pipeline(transaction=False)
+        for key in keys:
+            p.hgetall(key)
+        site_hashes = p.execute()
+
+        for site_hash in [h for h in site_hashes if h is not None]:
+            site_model = FlatSiteSchema().load(site_hash)
+            sites.add(site_model)
+
+        return sites

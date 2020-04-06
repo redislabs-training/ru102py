@@ -1,0 +1,17 @@
+venv/
+env/
+node_modules/
+
+*.pyc
+__pycache__/
+.pytest_cache
+.mypy_cache
+
+.coverage
+htmlcov/
+
+dist/
+*.egg-info/
+npm-debug.log
+
+.vscode

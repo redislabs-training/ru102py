@@ -1,0 +1,15 @@
+Flask==1.1.1
+redis==3.3.11
+ipdb==0.12.3
+reorder-python-imports==1.9.0
+progress==1.5
+yapf
+pylint
+pytest
+mypy==0.761
+Flask-RESTful==0.3.8
+webargs==6.0.0
+marshmallow-dataclass[enum,union]==7.3.0
+Flask-Cors==3.0.8
+hiredis==1.0.1
+redisolar-sample-data-generator==1.0.4
