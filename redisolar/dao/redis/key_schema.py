@@ -48,7 +48,7 @@ class KeySchema:
         return "sites:geo"
 
     @prefixed_key
-    def site_stats_key(self, site_id: int, day: datetime.datetime):
+    def site_stats_key(self, site_id, day):
         """
         sites:stats:[year-month-day]:[site_id]
         Redis type: sorted set

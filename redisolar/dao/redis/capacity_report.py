@@ -1,4 +1,5 @@
 from redisolar.dao.base import CapacityDaoBase
+from redisolar.dao.redis import key_schema
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.models import CapacityReport
 from redisolar.models import MeterReading
@@ -7,12 +8,13 @@ from redisolar.models import SiteCapacityTuple
 
 class CapacityReportDaoRedis(CapacityDaoBase, RedisDaoBase):
     """Persists and queries CapacityReports in Redis."""
-    def update(self, meter_reading: MeterReading) -> None:
+    def update(self, meter_reading: MeterReading, **kwargs) -> None:
         capacity_ranking_key = self.key_schema.capacity_ranking_key()
-        self.redis.zadd(capacity_ranking_key,
-                        {meter_reading.site_id: meter_reading.current_capacity})
+        client = kwargs.get('pipeline', self.redis)
+        client.zadd(capacity_ranking_key,
+                    {meter_reading.site_id: meter_reading.current_capacity})
 
-    def get_report(self, limit: int) -> CapacityReport:
+    def get_report(self, limit: int, **kwargs) -> CapacityReport:
         capacity_ranking_key = self.key_schema.capacity_ranking_key()
         p = self.redis.pipeline()
         p.zrange(capacity_ranking_key, 0, limit - 1, withscores=True)

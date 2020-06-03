@@ -3,6 +3,8 @@ from collections import deque
 from typing import Deque
 from typing import List
 
+import redis
+
 from redisolar.dao.base import MetricDaoBase
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.models import Measurement
@@ -85,6 +87,7 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         """
         hour = date.hour
         minute = date.minute
+
         return hour * 60 + minute
 
     def _get_date_from_day_minute(self, date: datetime.datetime,
@@ -93,29 +96,45 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         hour = int(day_minute / 60)
         return date.replace(hour=hour, minute=minute)
 
-    def insert(self, meter_reading: MeterReading) -> None:
-        self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
-                           MetricUnit.WH_GENERATED, meter_reading.timestamp)
-        self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
-                           MetricUnit.WH_USED, meter_reading.timestamp)
-        self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
-                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp)
+    def insert(self, meter_reading: MeterReading, **kwargs) -> None:
+        pipeline = kwargs.get('pipeline')
+        execute = False
 
+        if pipeline is None:
+            execute = True
+            pipeline = self.redis.pipeline()
+
+        self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
+                           MetricUnit.WH_GENERATED, meter_reading.timestamp,
+                           pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
+                           MetricUnit.WH_USED, meter_reading.timestamp,
+                           pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
+                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp,
+                           pipeline)
+
+        if execute:
+            pipeline.execute()
+
+    # Challenge #2
     def insert_metric(self, site_id: int, value: float, unit: MetricUnit,
-                      time: datetime.datetime):
+                      time: datetime.datetime,
+                      pipeline: redis.client.Pipeline):
         metric_key = self.key_schema.day_metric_key(site_id, unit, time)
         minute_of_day = self._get_day_minute(time)
 
-        p = self.redis.pipeline()
-        p.zadd(metric_key,
-               {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
-        p.expire(metric_key, METRIC_EXPIRATION_SECONDS)
-        p.execute()
+        pipeline.zadd(
+            metric_key,
+            {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
+        pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
 
-    def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
-                   limit: int) -> Deque[Measurement]:
+    def get_recent(self, site_id: int, unit: MetricUnit,
+                   time: datetime.datetime, limit: int,
+                   **kwargs) -> Deque[Measurement]:
         if limit > METRICS_PER_DAY * MAX_METRIC_RETENTION_DAYS:
-            raise ValueError("Cannot request more than two weeks of minute-level data")
+            raise ValueError(
+                "Cannot request more than two weeks of minute-level data")
 
         measurements: deque = deque()
         current_date = time

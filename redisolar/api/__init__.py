@@ -1,10 +1,7 @@
 import os
 import signal
-import sys
-from functools import partial
 
 from flask import Blueprint
-from flask import request
 from flask_restful import Api
 from redis import exceptions
 

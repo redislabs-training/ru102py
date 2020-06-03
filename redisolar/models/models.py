@@ -130,13 +130,13 @@ class Plot:
 @dataclass(frozen=True, eq=True)
 class SiteStats:
     """Reporting stats for a site."""
-    # Make commonly-referenced SiteStats fields available.
     last_reporting_time: datetime.datetime
     meter_reading_count: int
     max_wh_generated: float
     min_wh_generated: float
     max_capacity: float
 
+    # Make commonly-referenced SiteStats fields available.
     LAST_REPORTING_TIME = "last_reporting_time"
     COUNT = "meter_reading_count"
     MAX_WH = "max_wh_generated"

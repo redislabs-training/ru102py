@@ -1,5 +1,5 @@
 APP := redisolar
-PORT := 8001
+PORT := 8081
 
 
 ifeq (${IS_CI}, true)
@@ -14,7 +14,7 @@ env: env/bin/activate
 
 env/bin/activate: requirements.txt
 	test -d env || python3 -m venv env
-	. env/bin/activate; pip install wheel; pip install -Ue .
+	. env/bin/activate; pip install wheel; pip install -Ue ".[dev]"
 	touch env/bin/activate
 
 mypy: env
@@ -42,4 +42,4 @@ frontend: env
 	cp frontend/dist/index.html redisolar/static/
 
 load: env
-	. env/bin/activate; load_redisolar
+	. env/bin/activate; FLASK_APP=$(APP) flask load

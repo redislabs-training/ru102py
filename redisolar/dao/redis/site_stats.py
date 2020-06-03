@@ -1,12 +1,13 @@
 import datetime
 
-from redisolar.models import MeterReading
-from redisolar.models import SiteStats
-from redisolar.scripts import CompareAndUpdateScript
+import redis.client
+
 from redisolar.dao.base import SiteStatsDaoBase
 from redisolar.dao.redis.base import RedisDaoBase
+from redisolar.models import MeterReading
+from redisolar.models import SiteStats
 from redisolar.schema import SiteStatsSchema
-
+from redisolar.scripts import CompareAndUpdateScript
 
 WEEK_SECONDS = 60 * 60 * 24 * 7
 
@@ -21,7 +22,8 @@ class SiteStatsDaoRedis(SiteStatsDaoBase, RedisDaoBase):
         super().__init__(*args, **kwargs)
         self.compare_and_update_script = CompareAndUpdateScript(self.redis)
 
-    def find_by_id(self, site_id: int, day: datetime.datetime = None) -> SiteStats:
+    def find_by_id(self, site_id: int, day: datetime.datetime = None,
+                   **kwargs) -> SiteStats:
         if day is None:
             day = datetime.datetime.now()
 
@@ -33,12 +35,7 @@ class SiteStatsDaoRedis(SiteStatsDaoBase, RedisDaoBase):
 
         return SiteStatsSchema().load(fields)
 
-    def update(self, meter_reading: MeterReading) -> None:
-        key = self.key_schema.site_stats_key(meter_reading.site_id, meter_reading.timestamp)
-        # self.update_basic(key, meter_reading)
-        self.update_optimized(key, meter_reading)
-
-    def update_basic(self, key: str, reading: MeterReading) -> None:
+    def _update_basic(self, key: str, reading: MeterReading) -> None:
         reporting_time = datetime.datetime.utcnow().isoformat()
         self.redis.hset(key, SiteStats.LAST_REPORTING_TIME, reporting_time)
         self.redis.hincrby(key, SiteStats.COUNT, 1)
@@ -56,19 +53,35 @@ class SiteStatsDaoRedis(SiteStatsDaoBase, RedisDaoBase):
         if not max_capacity or reading.current_capacity > float(max_capacity):
             self.redis.hset(key, SiteStats.MAX_CAPACITY, reading.wh_generated)
 
-    def update_optimized(self, key: str, reading: MeterReading) -> None:
+    # Challenge #3
+    def _update_optimized(self, key: str, meter_reading: MeterReading,
+                          pipeline: redis.client.Pipeline = None) -> None:
+        execute = False
+        if pipeline is None:
+            pipeline = self.redis.pipeline()
+            execute = True
+
         reporting_time = datetime.datetime.utcnow().isoformat()
 
-        p = self.redis.pipeline()
-        p.hset(key, SiteStats.LAST_REPORTING_TIME, reporting_time)
-        p.hincrby(key, SiteStats.COUNT, 1)
-        p.expire(key, WEEK_SECONDS)
+        pipeline.hset(key, SiteStats.LAST_REPORTING_TIME, reporting_time)
+        pipeline.hincrby(key, SiteStats.COUNT, 1)
+        pipeline.expire(key, WEEK_SECONDS)
 
         self.compare_and_update_script.update_if_greater(
-            p, key, SiteStats.MAX_WH, reading.wh_generated)
+            pipeline, key, SiteStats.MAX_WH, meter_reading.wh_generated)
         self.compare_and_update_script.update_if_less(
-            p, key, SiteStats.MIN_WH, reading.wh_generated)
+            pipeline, key, SiteStats.MIN_WH, meter_reading.wh_generated)
         self.compare_and_update_script.update_if_greater(
-            p, key, SiteStats.MAX_CAPACITY, reading.current_capacity)
+            pipeline, key, SiteStats.MAX_CAPACITY, meter_reading.current_capacity)
 
-        p.execute()
+        if execute:
+            pipeline.execute()
+
+    def update(self, meter_reading: MeterReading, **kwargs) -> None:
+        key = self.key_schema.site_stats_key(meter_reading.site_id,
+                                             meter_reading.timestamp)
+        pipeline = kwargs.get('pipeline')
+
+        self._update_basic(key, meter_reading)
+        # self._update_optimized(key, meter_reading, pipeline)
+

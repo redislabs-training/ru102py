@@ -68,9 +68,8 @@ def test_datetime_is_unix_timestamp(metric_dao, client):
     measurement = plots[0]['measurements'][0]
     mdt = datetime.datetime.fromtimestamp(measurement['timestamp'])
     rdt = reading.timestamp
-    assert mdt.hour == rdt.hour and mdt.second == rdt.second \
-        and mdt.minute == rdt.minute and mdt.day == mdt.day \
-        and mdt.year == rdt.year
+    assert mdt.hour == rdt.hour and mdt.minute == rdt.minute \
+        and mdt.day == mdt.day and mdt.year == rdt.year
 
 
 def test_small(metric_dao, readings, client):

@@ -11,30 +11,30 @@ CAPACITY_THRESHOLD = 0.2
 
 class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
     """SiteGeoDaoRedis persists and queries Sites in Redis."""
-    def insert(self, site: Site):
+    def insert(self, site: Site, **kwargs):
         """Insert a Site into Redis."""
         hash_key = self.key_schema.site_hash_key(site.id)
-        self.redis.hmset(hash_key, FlatSiteSchema().dump(site))
+        self.redis.hset(hash_key, mapping=FlatSiteSchema().dump(site))
+        client = kwargs.get('pipeline', self.redis)
 
         if not site.coordinate:
             raise ValueError("Site coordinates are required for Geo insert")
 
-        self.redis.geoadd(  # type: ignore
-            self.key_schema.site_geo_key(), site.coordinate.lng, site.coordinate.lat,
-            hash_key)
+        client.geoadd(  # type: ignore
+            self.key_schema.site_geo_key(), site.coordinate.lng, site.coordinate.lat, hash_key)
 
-    def insert_many(self, *sites: Site) -> None:
+    def insert_many(self, *sites: Site, **kwargs) -> None:
         """Insert multiple Sites into Redis."""
         for site in sites:
-            self.insert(site)
+            self.insert(site, **kwargs)
 
-    def find_by_id(self, site_id: int) -> Site:
+    def find_by_id(self, site_id: int, **kwargs) -> Site:
         """Find a Site by ID in Redis."""
         hash_key = self.key_schema.site_hash_key(site_id)
         site_hash = self.redis.hgetall(hash_key)
         return FlatSiteSchema().load(site_hash)
 
-    def _find_by_geo(self, query: GeoQuery) -> Set[Site]:
+    def _find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
         sites = self.redis.georadius(  # type: ignore
             self.key_schema.site_geo_key(), query.coordinate.lng, query.coordinate.lat,
             query.radius, query.radius_unit.value)
@@ -67,13 +67,13 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
             for site in sites if scores[site.id] and scores[site.id] > CAPACITY_THRESHOLD
         }
 
-    def find_by_geo(self, query: GeoQuery) -> Set[Site]:
+    def find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
         """Find Sites using a geographic query."""
         if query.only_excess_capacity:
             return self._find_by_geo_with_capacity(query)
         return self._find_by_geo(query)
 
-    def find_all(self) -> Set[Site]:
+    def find_all(self, **kwargs) -> Set[Site]:
         """Find all Sites."""
         keys = self.redis.zrange(self.key_schema.site_geo_key(), 0, -1)
         sites = set()

@@ -9,8 +9,11 @@ from redisolar.dao.redis.base import RedisDaoBase
 
 class MeterReadingDaoRedis(MeterReadingDaoBase, RedisDaoBase):
     """MeterReadingDaoRedis persists MeterReading models to Redis."""
-    def add(self, meter_reading: MeterReading) -> None:
-        MetricDaoRedis(self.redis, self.key_schema).insert(meter_reading)
-        SiteStatsDaoRedis(self.redis, self.key_schema).update(meter_reading)
-        CapacityReportDaoRedis(self.redis, self.key_schema).update(meter_reading)
-        FeedDaoRedis(self.redis, self.key_schema).insert(meter_reading)
+    def add(self, meter_reading: MeterReading, **kwargs) -> None:
+        MetricDaoRedis(self.redis, self.key_schema).insert(meter_reading, **kwargs)
+        CapacityReportDaoRedis(self.redis, self.key_schema).update(meter_reading, **kwargs)
+        FeedDaoRedis(self.redis, self.key_schema).insert(meter_reading, **kwargs)
+
+        # Challenge #3
+        # SiteStatsDaoRedis(self.redis, self.key_schema).update(meter_reading, **kwargs)
+
