@@ -8,14 +8,22 @@ This is the sample application codebase for RU102PY, Redis for Python developers
 
 To start and run this application, you will need:
 
-* [Python 3](https://www.python.org/downloads/) (version 3.7 or newer)
+* [Python 3.8 or newer](https://www.python.org/downloads/) (**Note**: It must be version 3.8 or newer)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
 * Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at [https://oss.redislabs.com/redistimeseries/#setup)](https://oss.redislabs.com/redistimeseries/#setup)
 
 **NOTE**: The Makefile for this project assumes that `python3` points to Python
-3.7 or newer on your system. If that is not the case, you should install Python
-3.7 or newer with [pyenv](https://github.com/pyenv/pyenv), your operating
+3.8 or newer on your system. If that is not the case, you should install Python
+3.8 or newer with [pyenv](https://github.com/pyenv/pyenv), your operating
 system's package manager, or a manual download before proceeding.
+
+#### Setting default Python 3 version on Ubuntu
+
+If you have multiple versions of Python 3 installed on Ubuntu, you can make /usr/bin/python3 point to Python 3.8 with the following command:
+
+    $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/binb/python3.8 1
+
+After you run this command, running `python3 --version` should report 3.8.
 
 ### Setting up Python dependencies with make
 

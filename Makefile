@@ -13,6 +13,7 @@ endif
 env: env/bin/activate
 
 env/bin/activate: requirements.txt
+	@python3 --version | grep 3.8; if [ $$? -eq 1 ]; then echo "python3 does not point to Python 3.8. Please fix! See README.md." && exit 1; fi
 	test -d env || python3 -m venv env
 	. env/bin/activate; pip install wheel; pip install -Ue ".[dev]"
 	touch env/bin/activate
