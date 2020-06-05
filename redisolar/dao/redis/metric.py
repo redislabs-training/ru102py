@@ -57,7 +57,6 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         # Use negative indexes to get `count` number of items from the end
         # of the sorted set.
         metrics = self.redis.zrange(key, -(count), -1, withscores=True)
-        # metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
 
         for metric in metrics:
             # `zrevrange()` returns (member, score) tuples, and within these
