@@ -7,8 +7,8 @@ def test_configurable_prefix(app):
 
 
 def test_site_hash_key(app, key_schema):
-    assert key_schema.site_hash_key(1) == "test:sites:info:1"
+    assert key_schema.site_hash_key(1) == "ru102py-test:sites:info:1"
 
 
 def test_site_ids_key(app, key_schema):
-    assert key_schema.site_ids_key() == "test:sites:ids"
+    assert key_schema.site_ids_key() == "ru102py-test:sites:ids"
