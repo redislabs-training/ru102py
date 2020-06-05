@@ -41,11 +41,8 @@ def _test_insert_and_retrieve(readings: List[MeterReading],
                                          NOW, limit)
     assert len(measurements) == limit
 
-    i = limit
-    for measurement in measurements:
-        assert measurement.value == (i - 1) * 1.0
-        i -= 1
-
+    for i in range(limit, 0):
+        assert measurements[i].value == (i - 1) * 1.0
 
 # Challenge #2
 

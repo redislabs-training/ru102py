@@ -1,6 +1,4 @@
 import datetime
-from collections import deque
-from typing import Deque
 from typing import List
 
 import redis
@@ -56,9 +54,10 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         # e.g.: metrics:whU:2020-01-01:1
         key = self.key_schema.day_metric_key(site_id, unit, date)
 
-        # Return a reverse range so that we're always consuming from the end
+        # Use negative indexes to get `count` number of items from the end
         # of the sorted set.
-        metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
+        metrics = self.redis.zrange(key, -(count), -1, withscores=True)
+        # metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
 
         for metric in metrics:
             # `zrevrange()` returns (member, score) tuples, and within these
@@ -105,45 +104,39 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
             pipeline = self.redis.pipeline()
 
         self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
-                           MetricUnit.WH_GENERATED, meter_reading.timestamp,
-                           pipeline)
+                           MetricUnit.WH_GENERATED, meter_reading.timestamp, pipeline)
         self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
-                           MetricUnit.WH_USED, meter_reading.timestamp,
-                           pipeline)
+                           MetricUnit.WH_USED, meter_reading.timestamp, pipeline)
         self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
-                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp,
-                           pipeline)
+                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp, pipeline)
 
         if execute:
             pipeline.execute()
 
     # Challenge #2
     def insert_metric(self, site_id: int, value: float, unit: MetricUnit,
-                      time: datetime.datetime,
-                      pipeline: redis.client.Pipeline):
+                      time: datetime.datetime, pipeline: redis.client.Pipeline):
         metric_key = self.key_schema.day_metric_key(site_id, unit, time)
         minute_of_day = self._get_day_minute(time)
 
-        pipeline.zadd(
-            metric_key,
-            {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
+        pipeline.zadd(metric_key,
+                      {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
         pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
 
-    def get_recent(self, site_id: int, unit: MetricUnit,
-                   time: datetime.datetime, limit: int,
-                   **kwargs) -> Deque[Measurement]:
-        if limit > METRICS_PER_DAY * MAX_METRIC_RETENTION_DAYS:
-            raise ValueError(
-                "Cannot request more than two weeks of minute-level data")
+    def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
+                   limit: int) -> List[Measurement]:
 
-        measurements: deque = deque()
+        if limit > METRICS_PER_DAY * MAX_METRIC_RETENTION_DAYS:
+            raise ValueError("Cannot request more than two weeks of minute-level data")
+
+        measurements = []
         current_date = time
         count = limit
         iterations = 0
 
         while count > 0 and iterations < MAX_DAYS_TO_RETURN:
             ms = self._get_measurements_for_date(site_id, current_date, unit, count)
-            measurements.extendleft(ms)
+            measurements.extend(ms)
             count -= len(ms)
             current_date = current_date - datetime.timedelta(days=1)
             iterations += 1

@@ -68,7 +68,7 @@ class MetricDaoBase(abc.ABC):
 
     @abc.abstractmethod
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
-                   limit: int) -> Deque[Measurement]:
+                   limit: int) -> List[Measurement]:
         pass
 
 
