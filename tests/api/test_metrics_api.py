@@ -68,8 +68,12 @@ def test_datetime_is_unix_timestamp(metric_dao, client):
     measurement = plots[0]['measurements'][0]
     mdt = datetime.datetime.fromtimestamp(measurement['timestamp'])
     rdt = reading.timestamp
-    assert mdt.hour == rdt.hour and mdt.minute == rdt.minute \
-        and mdt.day == mdt.day and mdt.year == rdt.year
+    assert mdt.year == rdt.year and mdt.month == rdt.month \
+        and mdt.day == rdt.day and mdt.minute == rdt.minute
+    # When assigning measurements to minutes of the day, we ignore
+    # the seconds value -- so when we get a measurement out of Redis
+    # later, the seconds value is zero.
+    assert mdt.second == 0
 
 
 def test_small(metric_dao, readings, client):

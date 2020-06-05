@@ -59,13 +59,14 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         metrics = self.redis.zrange(key, -(count), -1, withscores=True)
 
         for metric in metrics:
-            # `zrevrange()` returns (member, score) tuples, and within these
+            # `zrange()` returns (member, score) tuples, and within these
             # tuples, "member" is a string of the form [measurement]:[minute].
             # The MeasurementMinute class abstracts this for us.
             mm = MeasurementMinute.from_zset_value(metric[0])
 
             # Derive the datetime for the measurement using the date and
-            # the minute of the day.
+            # the minute of the day. Note that this always returns datetime
+            # objects whose seconds value is zero.
             date = self._get_date_from_day_minute(date, mm.minute_of_day)
 
             # Add a new measurement to the list of measurements.
@@ -90,9 +91,9 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
 
     def _get_date_from_day_minute(self, date: datetime.datetime,
                                   day_minute: int) -> datetime.datetime:
-        minute = int(day_minute % 60)
-        hour = int(day_minute / 60)
-        return date.replace(hour=hour, minute=minute)
+        start = datetime.datetime(year=date.year, month=date.month, day=date.day,
+                                  hour=0, minute=0)
+        return start + datetime.timedelta(minutes=day_minute)
 
     def insert(self, meter_reading: MeterReading, **kwargs) -> None:
         pipeline = kwargs.get('pipeline')
