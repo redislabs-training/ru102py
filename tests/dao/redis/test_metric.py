@@ -44,6 +44,7 @@ def _test_insert_and_retrieve(readings: List[MeterReading],
     for i in range(limit, 0):
         assert measurements[i].value == (i - 1) * 1.0
 
+
 # Challenge #2
 
 @pytest.mark.skip("Remove for challenge #2")
