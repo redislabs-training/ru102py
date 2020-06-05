@@ -17,11 +17,11 @@ class SampleDataGenerator:
     SEED = 42
     MAX_TEMPERATURE_C = 30.0
 
-    def __init__(self, redis, sites, days, key_schema):
+    def __init__(self, redis_client, sites, days, key_schema):
         if days < 0 or days > 365:
             raise ValueError(f"Invalid days {days} for historical request")
 
-        self.redis = redis
+        self.redis = redis_client
         self.sites = sites
         self.minute_days = days * 3 * 60
         self.key_schema = key_schema

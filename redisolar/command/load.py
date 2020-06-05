@@ -7,7 +7,7 @@ from progress.bar import Bar
 from flask import current_app
 
 from redisolar.core import get_redis_connection
-from redisolar.core import SampleDataGenerator
+from redisolar.core import SampleDataGenerator  # pylint: disable=unused-import
 from redisolar.dao import SiteDaoRedis
 from redisolar.dao import SiteGeoDaoRedis
 from redisolar.schema import FlatSiteSchema
@@ -58,8 +58,6 @@ def load(request_password, filename, delete_keys):
     with open(filename, 'r') as f:
         sites = [FlatSiteSchema().load(d) for d in json.loads(f.read())]
 
-    sample_generator = SampleDataGenerator(client, sites, 1, key_schema)
-
     sites_bar = Bar('Loading sites', max=len(sites))
     p = client.pipeline(transaction=False)
     for site in sites:
@@ -70,6 +68,7 @@ def load(request_password, filename, delete_keys):
 
     # Challenge #2
     # print()
+    # sample_generator = SampleDataGenerator(client, sites, 1, key_schema)
     # readings_bar = Bar('Generating metrics data', max=sample_generator.size)
     # p = client.pipeline(transaction=False)
     # for _ in sample_generator.generate(p):

@@ -124,7 +124,7 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
 
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
-                   limit: int) -> List[Measurement]:
+                   limit: int, **kwargs) -> List[Measurement]:
 
         if limit > METRICS_PER_DAY * MAX_METRIC_RETENTION_DAYS:
             raise ValueError("Cannot request more than two weeks of minute-level data")

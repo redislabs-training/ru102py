@@ -14,7 +14,7 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
     def insert(self, site: Site, **kwargs):
         """Insert a Site into Redis."""
         hash_key = self.key_schema.site_hash_key(site.id)
-        self.redis.hset(hash_key, mapping=FlatSiteSchema().dump(site))
+        self.redis.hset(hash_key, mapping=FlatSiteSchema().dump(site))  # type: ignore
         client = kwargs.get('pipeline', self.redis)
 
         if not site.coordinate:

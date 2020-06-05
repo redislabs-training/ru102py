@@ -80,8 +80,8 @@ class SiteStatsDaoRedis(SiteStatsDaoBase, RedisDaoBase):
     def update(self, meter_reading: MeterReading, **kwargs) -> None:
         key = self.key_schema.site_stats_key(meter_reading.site_id,
                                              meter_reading.timestamp)
-        pipeline = kwargs.get('pipeline')
-
         self._update_basic(key, meter_reading)
-        # self._update_optimized(key, meter_reading, pipeline)
 
+        # Challenge 3
+        # pipeline = kwargs.get('pipeline')
+        # self._update_optimized(key, meter_reading, pipeline)

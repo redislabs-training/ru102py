@@ -1,5 +1,4 @@
 from redisolar.dao.base import CapacityDaoBase
-from redisolar.dao.redis import key_schema
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.models import CapacityReport
 from redisolar.models import MeterReading
@@ -31,6 +30,6 @@ class CapacityReportDaoRedis(CapacityDaoBase, RedisDaoBase):
         return CapacityReport(high_capacity_list, low_capacity_list)
 
     # Challenge 6
-    def get_rank(self, site_id: int) -> float:
+    def get_rank(self, site_id: int, **kwargs) -> float:
         capacity_ranking_key = self.key_schema.capacity_ranking_key()
         return self.redis.zrevrank(capacity_ranking_key, site_id)
