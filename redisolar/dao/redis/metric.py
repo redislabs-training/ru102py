@@ -1,5 +1,6 @@
 import datetime
-from typing import List
+from collections import deque
+from typing import List, Deque
 
 import redis
 
@@ -56,7 +57,7 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
 
         # Use negative indexes to get `count` number of items from the end
         # of the sorted set.
-        metrics = self.redis.zrange(key, -(count), -1, withscores=True)
+        metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
 
         for metric in metrics:
             # `zrange()` returns (member, score) tuples, and within these
@@ -124,19 +125,28 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
 
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
-                   limit: int, **kwargs) -> List[Measurement]:
+                   limit: int, **kwargs) -> Deque[Measurement]:
 
         if limit > METRICS_PER_DAY * MAX_METRIC_RETENTION_DAYS:
             raise ValueError("Cannot request more than two weeks of minute-level data")
 
-        measurements = []
+        measurements: deque = deque()
         current_date = time
         count = limit
         iterations = 0
 
+        # We're going to start at the end of the sorted set and go backwards in
+        # time until we reach the limit of measurements or max number of days
+        # to return. That means that we're retrieving data from redis in
+        # newest -> oldest sorted order.
+        #
+        # However, we want to give it to clients in oldest -> newest sorted
+        # order. So, we use a double-ended queue and add data to its left side.
+        # By adding data to the left side, we in effect reverse it, ending up
+        # with all data sorted correctly in oldest -> newest order.
         while count > 0 and iterations < MAX_DAYS_TO_RETURN:
             ms = self._get_measurements_for_date(site_id, current_date, unit, count)
-            measurements.extend(ms)
+            measurements.extendleft(ms)
             count -= len(ms)
             current_date = current_date - datetime.timedelta(days=1)
             iterations += 1

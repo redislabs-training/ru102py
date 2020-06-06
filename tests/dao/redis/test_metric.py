@@ -41,12 +41,13 @@ def _test_insert_and_retrieve(readings: List[MeterReading],
                                          NOW, limit)
     assert len(measurements) == limit
 
-    for i in range(limit, 0):
-        assert measurements[i].value == (i - 1) * 1.0
+    i = limit
+    for measurement in measurements:
+        assert measurement.value == (i - 1) * 1.0
+        i -= 1
 
 
 # Challenge #2
-
 @pytest.mark.skip("Remove for challenge #2")
 def test_small(metric_dao, readings):
     _test_insert_and_retrieve(readings, metric_dao, 1)

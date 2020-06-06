@@ -1,6 +1,6 @@
 import abc
 import datetime
-from typing import List
+from typing import List, Deque
 from typing import Set
 
 from redisolar.models import CapacityReport
@@ -70,7 +70,7 @@ class MetricDaoBase(abc.ABC):
 
     @abc.abstractmethod
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
-                   limit: int, **kwargs) -> List[Measurement]:
+                   limit: int, **kwargs) -> Deque[Measurement]:
         pass
 
 
