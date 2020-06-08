@@ -15,7 +15,7 @@ def test_hello(redis):
     assert value == "world"
 
 
-def test_redis_list_rpush(redis):
+def test_redis_list(redis):
     # Add all test planets to a Redis list
     result = redis.rpush(PLANETS_LIST_KEY, *PLANETS)
 
