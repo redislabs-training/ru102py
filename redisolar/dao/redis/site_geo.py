@@ -43,7 +43,7 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
 
     # Challenge #5
     def _find_by_geo_with_capacity_noop(self, query: GeoQuery) -> Set[Site]:
-        return {}
+        return set()
 
     def _find_by_geo_with_capacity(self, query: GeoQuery, **kwargs) -> Set[Site]:
         # START Challenge #5
