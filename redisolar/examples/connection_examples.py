@@ -5,7 +5,8 @@ from rediscluster import RedisCluster
 
 def connection_examples():
     # Connect to a standard Redis deployment.
-    client = redis.Redis("localhost", port=6379, decode_responses=True)
+    client = redis.Redis("localhost", port=6379, decode_responses=True,
+                         max_connections=20)
 
     # Read and write through the client.
     client.set("foo", "bar")
