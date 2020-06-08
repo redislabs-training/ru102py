@@ -48,7 +48,6 @@ def _test_insert_and_retrieve(readings: List[MeterReading],
 
 
 # Challenge #2
-
 @pytest.mark.skip("Remove for challenge #2")
 def test_small(metric_dao, readings):
     _test_insert_and_retrieve(readings, metric_dao, 1)

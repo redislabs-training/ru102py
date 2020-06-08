@@ -1,7 +1,6 @@
 import datetime
 from collections import deque
-from typing import Deque
-from typing import List
+from typing import List, Deque
 
 import redis
 
@@ -56,7 +55,7 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         # e.g.: metrics:whU:2020-01-01:1
         key = self.key_schema.day_metric_key(site_id, unit, date)
 
-        # Return a reverse range so that we're always consuming from the end
+        # Use negative indexes to get `count` number of items from the end
         # of the sorted set.
         metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
 
@@ -67,7 +66,8 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
             mm = MeasurementMinute.from_zset_value(metric[0])
 
             # Derive the datetime for the measurement using the date and
-            # the minute of the day.
+            # the minute of the day. Note that this always returns datetime
+            # objects whose seconds value is zero.
             date = self._get_date_from_day_minute(date, mm.minute_of_day)
 
             # Add a new measurement to the list of measurements.
@@ -92,9 +92,9 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
 
     def _get_date_from_day_minute(self, date: datetime.datetime,
                                   day_minute: int) -> datetime.datetime:
-        minute = int(day_minute % 60)
-        hour = int(day_minute / 60)
-        return date.replace(hour=hour, minute=minute)
+        start = datetime.datetime(year=date.year, month=date.month, day=date.day,
+                                  hour=0, minute=0)
+        return start + datetime.timedelta(minutes=day_minute)
 
     def insert(self, meter_reading: MeterReading, **kwargs) -> None:
         pipeline = kwargs.get('pipeline')
@@ -105,42 +105,45 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
             pipeline = self.redis.pipeline()
 
         self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
-                           MetricUnit.WH_GENERATED, meter_reading.timestamp,
-                           pipeline)
+                           MetricUnit.WH_GENERATED, meter_reading.timestamp, pipeline)
         self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
-                           MetricUnit.WH_USED, meter_reading.timestamp,
-                           pipeline)
+                           MetricUnit.WH_USED, meter_reading.timestamp, pipeline)
         self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
-                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp,
-                           pipeline)
+                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp, pipeline)
 
         if execute:
             pipeline.execute()
 
     # Challenge #2
     def insert_metric(self, site_id: int, value: float, unit: MetricUnit,
-                      time: datetime.datetime,
-                      pipeline: redis.client.Pipeline):
+                      time: datetime.datetime, pipeline: redis.client.Pipeline):
         metric_key = self.key_schema.day_metric_key(site_id, unit, time)
         minute_of_day = self._get_day_minute(time)
 
-        pipeline.zadd(
-            metric_key,
-            {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
+        pipeline.zadd(metric_key,
+                      {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
         pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
 
-    def get_recent(self, site_id: int, unit: MetricUnit,
-                   time: datetime.datetime, limit: int,
-                   **kwargs) -> Deque[Measurement]:
+    def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
+                   limit: int, **kwargs) -> Deque[Measurement]:
+
         if limit > METRICS_PER_DAY * MAX_METRIC_RETENTION_DAYS:
-            raise ValueError(
-                "Cannot request more than two weeks of minute-level data")
+            raise ValueError("Cannot request more than two weeks of minute-level data")
 
         measurements: deque = deque()
         current_date = time
         count = limit
         iterations = 0
 
+        # We're going to start at the end of the sorted set and go backwards in
+        # time until we reach the limit of measurements or max number of days
+        # to return. That means that we're retrieving data from redis in
+        # newest -> oldest sorted order.
+        #
+        # However, we want to give it to clients in oldest -> newest sorted
+        # order. So, we use a double-ended queue and add data to its left side.
+        # By adding data to the left side, we in effect reverse it, ending up
+        # with all data sorted correctly in oldest -> newest order.
         while count > 0 and iterations < MAX_DAYS_TO_RETURN:
             ms = self._get_measurements_for_date(site_id, current_date, unit, count)
             measurements.extendleft(ms)
