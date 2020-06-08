@@ -60,7 +60,7 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
 
         for metric in metrics:
-            # `zrange()` returns (member, score) tuples, and within these
+            # `zrevrange()` returns (member, score) tuples, and within these
             # tuples, "member" is a string of the form [measurement]:[minute].
             # The MeasurementMinute class abstracts this for us.
             mm = MeasurementMinute.from_zset_value(metric[0])
