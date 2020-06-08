@@ -9,10 +9,10 @@ from redisolar.models import SiteCapacityTuple
 class CapacityReportDaoRedis(CapacityDaoBase, RedisDaoBase):
     """Persists and queries CapacityReports in Redis."""
     def update(self, meter_reading: MeterReading, **kwargs) -> None:
-        capacity_ranking_key = self.key_schema.capacity_ranking_key()
         client = kwargs.get('pipeline', self.redis)
-        client.zadd(capacity_ranking_key,
-                    {meter_reading.site_id: meter_reading.current_capacity})
+        capacity_ranking_key = self.key_schema.capacity_ranking_key()
+        report = {meter_reading.site_id: meter_reading.current_capacity}
+        client.zadd(capacity_ranking_key, report)
 
     def get_report(self, limit: int, **kwargs) -> CapacityReport:
         capacity_ranking_key = self.key_schema.capacity_ranking_key()
