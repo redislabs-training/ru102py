@@ -16,6 +16,8 @@ def test_hello(redis):
 
 
 def test_redis_list(redis):
+    assert len(PLANETS) == 11
+    
     # Add all test planets to a Redis list
     result = redis.rpush(PLANETS_LIST_KEY, *PLANETS)
 
