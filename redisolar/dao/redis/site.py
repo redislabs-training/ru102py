@@ -17,7 +17,7 @@ class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
         site_ids_key = self.key_schema.site_ids_key()
         client = kwargs.get('pipeline', self.redis)
         client.hset(hash_key, mapping=FlatSiteSchema().dump(site))
-        client.sadd(site_ids_key, hash_key)
+        client.sadd(site_ids_key, site.id)
 
     def insert_many(self, *sites: Site, **kwargs) -> None:
         for site in sites:
@@ -32,11 +32,12 @@ class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
     def find_all(self, **kwargs) -> Set[Site]:
         """Find all Sites in Redis."""
         site_ids_key = self.key_schema.site_ids_key()
-        site_keys = self.redis.smembers(site_ids_key)
+        site_ids = self.redis.smembers(site_ids_key)
 
         p = self.redis.pipeline()
-        for site_key in site_keys:
-            p.hgetall(site_key)
+        for site_id in site_ids:
+            key = self.key_schema.site_hash_key(site_id)
+            p.hgetall(key)
         site_hashes = p.execute()
 
         return {FlatSiteSchema().load(site_hash) for site_hash in site_hashes}
