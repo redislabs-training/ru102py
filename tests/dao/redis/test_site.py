@@ -54,7 +54,7 @@ def test_insert_many(site_dao):
     assert site_dao.find_by_id(3) == site3
 
 
-def test_find_by_id(site_dao):
+def test_find_by_id_existing_site(site_dao):
     site_id = 1
     site = Site(id=site_id,
                 capacity=10.0,
