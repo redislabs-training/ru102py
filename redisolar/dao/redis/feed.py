@@ -23,6 +23,7 @@ class FeedDaoRedis(FeedDaoBase, RedisDaoBase):
 
     def _insert(self, meter_reading: MeterReading,
                 pipeline: redis.client.Pipeline) -> None:
+        # START Challenge #6
         global_key = self.key_schema.global_feed_key()
         site_key = self.key_schema.feed_key(meter_reading.site_id)
         serialized_meter_reading = MeterReadingSchema().dump(meter_reading)

@@ -25,7 +25,7 @@ class SlidingWindowRateLimiter(RateLimiterDaoBase, RedisDaoBase):
         super().__init__(redis_client, key_schema, **kwargs)
 
     def hit(self, name: str):
-        # START CHALLENGE #7
+        # START Challenge #7
         key = self.key_schema.sliding_window_rate_limiter_key(name, self.window_size_ms,
                                                               self.max_hits)
         now = datetime.datetime.utcnow().timestamp() * 1000
@@ -39,4 +39,4 @@ class SlidingWindowRateLimiter(RateLimiterDaoBase, RedisDaoBase):
 
         if hits > self.max_hits:
             raise RateLimitExceededException()
-        # END CHALLENGE #7
+        # END Challenge #7
