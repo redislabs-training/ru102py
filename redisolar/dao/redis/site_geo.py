@@ -21,7 +21,8 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
             raise ValueError("Site coordinates are required for Geo insert")
 
         client.geoadd(  # type: ignore
-            self.key_schema.site_geo_key(), site.coordinate.lng, site.coordinate.lat, hash_key)
+            self.key_schema.site_geo_key(), site.coordinate.lng, site.coordinate.lat,
+            site.id)
 
     def insert_many(self, *sites: Site, **kwargs) -> None:
         """Insert multiple Sites into Redis."""
@@ -35,11 +36,14 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         return FlatSiteSchema().load(site_hash)
 
     def _find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
-        sites = self.redis.georadius(  # type: ignore
+        site_ids = self.redis.georadius(  # type: ignore
             self.key_schema.site_geo_key(), query.coordinate.lng, query.coordinate.lat,
             query.radius, query.radius_unit.value)
-
-        return {FlatSiteSchema().load(self.redis.hgetall(hash_key)) for hash_key in sites}
+        sites = [
+            self.redis.hgetall(self.key_schema.site_hash_key(site_id))
+            for site_id in site_ids
+        ]
+        return {FlatSiteSchema().load(site) for site in sites}
 
     # Challenge #5
     def _find_by_geo_with_capacity_noop(self, query: GeoQuery) -> Set[Site]:
@@ -49,16 +53,11 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         # START Challenge #5
         # Your task: Get the sites matching the GEO query.
         coord = query.coordinate
-        radius_responses = self.redis.georadius(  # type: ignore
+        site_ids = self.redis.georadius(  # type: ignore
             self.key_schema.site_geo_key(), coord.lng, coord.lat, query.radius,
             query.radius_unit.value)
         # END Challenge #5
 
-        sites = {
-            FlatSiteSchema().load(self.redis.hgetall(hash_key))
-            for hash_key in radius_responses
-        }
-        site_ids = [site.id for site in sites]
         p = self.redis.pipeline(transaction=False)
 
         # START Challenge #5
@@ -68,29 +67,36 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         #
         # Make sure to run any Redis commands against the Pipeline object
         # "p" for better performance.
-        for site in sites:
-            p.zscore(self.key_schema.capacity_ranking_key(), site.id)
-        scores = dict(zip(site_ids, reversed(p.execute())))
+        for site_id in site_ids:
+            p.zscore(self.key_schema.capacity_ranking_key(), site_id)
+        site_id_ints = [int(site_id) for site_id in site_ids]
+        scores = dict(zip(site_id_ints, reversed(p.execute())))
         # END Challenge #5
 
-        return {
-            site
-            for site in sites if scores[site.id] and scores[site.id] > CAPACITY_THRESHOLD
+        sites_with_capacity = {
+            site_id for site_id in site_id_ints
+            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD
         }
+
+        for site_id in sites_with_capacity:
+            p.hgetall(self.key_schema.site_hash_key(site_id))
+        site_hashes = p.execute()
+
+        return {FlatSiteSchema().load(site) for site in site_hashes}
 
     def find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
         """Find Sites using a geographic query."""
         if query.only_excess_capacity:
-            return self._find_by_geo_with_capacity_noop(query)
+            return self._find_by_geo_with_capacity(query)
         return self._find_by_geo(query)
 
     def find_all(self, **kwargs) -> Set[Site]:
         """Find all Sites."""
-        keys = self.redis.zrange(self.key_schema.site_geo_key(), 0, -1)
+        site_ids = self.redis.zrange(self.key_schema.site_geo_key(), 0, -1)
         sites = set()
         p = self.redis.pipeline(transaction=False)
-        for key in keys:
-            p.hgetall(key)
+        for site_id in site_ids:
+            p.hgetall(self.key_schema.site_hash_key(site_id))
         site_hashes = p.execute()
 
         for site_hash in [h for h in site_hashes if h is not None]:
