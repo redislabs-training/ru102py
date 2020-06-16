@@ -32,7 +32,7 @@ class CapacityReportDaoRedis(CapacityDaoBase, RedisDaoBase):
 
         return CapacityReport(high_capacity_list, low_capacity_list)
 
-    # Challenge 6
+    # Challenge 4
     def get_rank(self, site_id: int, **kwargs) -> float:
         capacity_ranking_key = self.key_schema.capacity_ranking_key()
         return self.redis.zrevrank(capacity_ranking_key, site_id)
