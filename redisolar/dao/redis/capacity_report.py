@@ -8,6 +8,9 @@ from redisolar.models import SiteCapacityTuple
 class CapacityReportDaoRedis(CapacityDaoBase, RedisDaoBase):
     """Persists and queries CapacityReports in Redis."""
     def update(self, meter_reading: MeterReading, **kwargs) -> None:
+        # Uses the Redis client instance in self.redis by default.  If a
+        # Pipeline object was provided, uses that instead -- Pipeline objects
+        # offer the same Redis command API as normal Redis clients.
         client = kwargs.get('pipeline', self.redis)
         capacity_ranking_key = self.key_schema.capacity_ranking_key()
         report = {meter_reading.site_id: meter_reading.current_capacity}
