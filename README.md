@@ -83,7 +83,7 @@ the correct values for your Redis instance.
 #### Key prefixes
 
 This project prefixes all keys with a string. By default, the dev server and
-sample data loader use the prefix "app:", while the test suite uses "test:".
+sample data loader use the prefix "ru102py-app:", while the test suite uses "ru102py-test:".
 
 When you run the tests, they add keys to the same Redis database that the
 running Flask application uses, but with the prefix "test:". Then when the
