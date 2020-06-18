@@ -12,7 +12,7 @@ def test_stream(redis):
         "temp_c": "18.0"
     }
 
-    redis.xadd(STREAM_KEY, entry, max_stream_entries)
+    redis.xadd(STREAM_KEY, entry, maxlen=max_stream_entries)
     results = redis.xrevrange(STREAM_KEY, count=1)
 
     assert len(results) == 1
