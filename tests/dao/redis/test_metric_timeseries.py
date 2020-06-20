@@ -19,10 +19,18 @@ def metric_dao(redis_timeseries, key_schema):
 
 @pytest.fixture
 def readings(metric_dao) -> Generator[List[MeterReading], None, None]:
-    """Generate 72 hours worth of data."""
+    """
+    Generate 72 hours worth of data.
+
+    Unlike with our sorted set implementation, RedisTimeSeries requires that we
+    add entries in order. So we generate meter readings oldest to newest.
+
+    We could also build a list and then reverse it, but where's the fun in
+    that?
+    """
     time = NOW - datetime.timedelta(hours=72)
     readings = []
-    for i in range(72 * 60, -1, -1):
+    for i in range((72 * 60) - 1, -1, -1):
         readings.append(
             MeterReading(site_id=1,
                          temp_c=i * 1.0,
@@ -44,7 +52,7 @@ def _test_insert_and_retrieve(readings: List[MeterReading],
 
     i = limit
     for measurement in measurements:
-        assert measurement.value == i * 1.0
+        assert measurement.value == (i - 1) * 1.0
         i -= 1
 
 
