@@ -1,6 +1,6 @@
 import abc
 import datetime
-from typing import List, Deque
+from typing import Iterable
 from typing import Set
 
 from redisolar.models import CapacityReport
@@ -70,7 +70,7 @@ class MetricDaoBase(abc.ABC):
 
     @abc.abstractmethod
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
-                   limit: int, **kwargs) -> Deque[Measurement]:
+                   limit: int, **kwargs) -> Iterable[Measurement]:
         pass
 
 
@@ -80,12 +80,12 @@ class FeedDaoBase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_recent_global(self, limit: int, **kwargs) -> List[MeterReading]:
+    def get_recent_global(self, limit: int, **kwargs) -> Iterable[MeterReading]:
         pass
 
     @abc.abstractmethod
     def get_recent_for_site(self, site_id: int, limit: int,
-                            **kwargs) -> List[MeterReading]:
+                            **kwargs) -> Iterable[MeterReading]:
         pass
 
 
@@ -99,3 +99,7 @@ class RateLimiterDaoBase(abc.ABC):
     @abc.abstractmethod
     def hit(self, name: str) -> None:
         pass
+
+
+class RateLimitExceededException(Exception):
+    """Raised when a rate limit is exceeded."""

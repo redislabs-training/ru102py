@@ -1,6 +1,4 @@
 import datetime
-import math
-from collections import deque
 from itertools import islice
 from typing import List
 
@@ -42,14 +40,14 @@ class MetricDaoRedisTimeseries(MetricDaoBase, RedisDaoBase):
                       time: datetime.datetime, pipeline: redis.client.Pipeline):
         metric_key = self.key_schema.timeseries_key(site_id, unit)
         time_ms = unix_milliseconds(time)
-        self.redis.add(metric_key, time_ms, value, RETENTION_MS)
+        self.redis.add(metric_key, time_ms, value, RETENTION_MS)  # type: ignore
 
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
                    limit: int, **kwargs) -> List[Measurement]:
         metric_key = self.key_schema.timeseries_key(site_id, unit)
         time_ms = unix_milliseconds(time)
         initial_timestamp = time_ms - (limit * 60) * 1000
-        values = self.redis.range(metric_key, initial_timestamp, time_ms)
+        values = self.redis.range(metric_key, initial_timestamp, time_ms)  # type: ignore
 
         return [
             Measurement(site_id=site_id,

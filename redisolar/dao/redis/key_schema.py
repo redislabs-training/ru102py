@@ -64,7 +64,8 @@ class KeySchema:
         return "sites:capacity:ranking"
 
     @prefixed_key
-    def day_metric_key(self, site_id: int, unit: MetricUnit, time: datetime.datetime) -> str:
+    def day_metric_key(self, site_id: int, unit: MetricUnit,
+                       time: datetime.datetime) -> str:
         """
         metric:[unit-name]:[year-month-day]:[site_id]
         Redis type: sorted set
@@ -88,8 +89,7 @@ class KeySchema:
         return f"sites:feed:{site_id}"
 
     @prefixed_key
-    def fixed_rate_limiter_key(self, name: str, minute_block: int,
-                               max_hits: float) -> str:
+    def fixed_rate_limiter_key(self, name: str, minute_block: int, max_hits: int) -> str:
         """
         limiter:[name]:[duration]:[max_hits]
         Redis type: string of type integer
@@ -98,7 +98,7 @@ class KeySchema:
 
     @prefixed_key
     def sliding_window_rate_limiter_key(self, name: str, window_size_ms: int,
-                                        max_hits: float) -> str:
+                                        max_hits: int) -> str:
         """
         limiter:[name]:[window_size_ms]:[max_hits]
         Redis type: string of type integer
@@ -107,4 +107,4 @@ class KeySchema:
 
     @prefixed_key
     def timeseries_key(self, site_id: int, unit: MetricUnit) -> str:
-        return f"sites:ts:{site_id}:{unit}"
+        return f"sites:ts:{site_id}:{unit.value}"
