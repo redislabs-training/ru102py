@@ -4,19 +4,16 @@ import random
 from redis.client import Redis
 
 from redisolar.dao.base import RateLimiterDaoBase
+from redisolar.dao.base import RateLimitExceededException
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.dao.redis.key_schema import KeySchema
-
-
-class RateLimitExceededException(Exception):
-    """Raised when the rate limit is exceeded."""
 
 
 class SlidingWindowRateLimiter(RateLimiterDaoBase, RedisDaoBase):
     """A sliding-window rate-limiter."""
     def __init__(self,
                  window_size_ms: float,
-                 max_hits: float,
+                 max_hits: int,
                  redis_client: Redis,
                  key_schema: KeySchema = None,
                  **kwargs):

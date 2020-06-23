@@ -73,7 +73,7 @@ def load(request_password, filename, delete_keys):
     # p = client.pipeline(transaction=False)
     # for _ in sample_generator.generate(p):
     #     readings_bar.next()
-    #
+
     print("\nFinishing up...")
     p.execute()
 

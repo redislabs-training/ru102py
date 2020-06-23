@@ -3,6 +3,7 @@ from redis import client as redis_client
 
 from redisolar import create_app
 from redisolar.core.connections import get_redis_connection
+from redisolar.core.connections import get_redis_timeseries_connection
 from redisolar.dao.redis.key_schema import KeySchema
 
 TEST_CONFIG = 'testing.cfg'
@@ -42,6 +43,12 @@ def client(app):
 @pytest.fixture
 def redis(app):
     yield get_redis_connection(app.config['REDIS_HOST'], app.config['REDIS_PORT'])
+
+
+@pytest.fixture
+def redis_timeseries(app):
+    yield get_redis_timeseries_connection(app.config['REDIS_HOST'],
+                                          app.config['REDIS_PORT'])
 
 
 @pytest.fixture
