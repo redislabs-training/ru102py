@@ -8,5 +8,5 @@ services:
 
   redis:
     container_name: redis
-    image: redis
+    image: redislabs/redistimeseries
     restart: always
