@@ -1,6 +1,6 @@
 # RediSolar Python
 
-This is the sample application codebase for RU102PY, Redis for Python developers.
+This is the sample application codebase for the Redis University course [RU102PY, Redis for Python Developers](https://university.redislabs.com/courses/ru102py/).
 
 ## Setup
 
