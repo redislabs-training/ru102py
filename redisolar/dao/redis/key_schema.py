@@ -6,6 +6,12 @@ DEFAULT_KEY_PREFIX = "ru102py-test"
 
 
 def prefixed_key(f):
+    """
+    A method decorator that prefixes return values.
+
+    Prefixes any string that the decorated method `f` returns with the value of
+    the `prefix` attribute on the owner object `self`.
+    """
     def prefixed_method(self, *args, **kwargs):
         key = f(self, *args, **kwargs)
         return f"{self.prefix}:{key}"
@@ -108,3 +114,41 @@ class KeySchema:
     @prefixed_key
     def timeseries_key(self, site_id: int, unit: MetricUnit) -> str:
         return f"sites:ts:{site_id}:{unit.value}"
+
+
+    # Test keys
+    @prefixed_key
+    def planets_list_key(self) -> str:
+        return "planets:list"
+
+    @prefixed_key
+    def planets_set_key(self) -> str:
+        return "planets:set"
+
+    @prefixed_key
+    def hello_key(self) -> str:
+        return "hello"
+
+    @prefixed_key
+    def quiz_get_members_key(self) -> str:
+        return "quiz:get-members"
+
+    @prefixed_key
+    def quiz_metrics_key(self) -> str:
+        return "quiz:metrics"
+
+    @prefixed_key
+    def quiz_pipeline_key_1(self) -> str:
+        return "quiz:pipeline1"
+
+    @prefixed_key
+    def quiz_pipeline_key_2(self) -> str:
+        return "quiz:pipeline2"
+
+    @prefixed_key
+    def quiz_streams_key(self) -> str:
+        return "quiz:streams"
+
+    @prefixed_key
+    def quiz_race_condition_key(self) -> str:
+        return "quiz:race-condition"
