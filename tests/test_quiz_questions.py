@@ -1,4 +1,19 @@
+"""Unit tests quiz questions in the final exam."""
+import datetime
 from typing import Set
+
+import pytest
+import redis as _redis
+
+from redisolar.dao.base import RateLimitExceededException
+
+
+def test_set_get(key_schema):
+    key = key_schema.quiz_get_set_key()
+    client = _redis.Redis()
+    client.set(key, 1.5)
+    result = client.get(key)
+    assert isinstance(result, bytes)
 
 
 def test_get_members(redis, key_schema):
@@ -66,13 +81,14 @@ def test_stream(redis, key_schema):
     client = redis
     key = key_schema.quiz_streams_key()
 
-    client.add(key, id="1-0", fields={"thing": 1})
-    client.add(key, id="2-0", fields={"thing": 1})
-    client.add(key, id="3-0", fields={"thing": 1})
+    client.xadd(key, id="1-0", fields={"thing": 1})
+    client.xadd(key, id="2-0", fields={"thing": 1})
+    client.xadd(key, id="3-0", fields={"thing": 1})
 
     _id, _ = client.xrange(key, '3-0', '3-0')[0]
 
     assert _id == "3-0"
+
 
 def test_race_condition(redis, key_schema):
     client = redis
@@ -87,3 +103,25 @@ def test_race_condition(redis, key_schema):
 
     update_temperature(key, 22)
     assert client.hget(key, "max-temp") == '22'
+
+
+def test_rate_limiter(redis, key_schema):
+    client = redis
+    now = datetime.datetime.now()
+    key = key_schema.quiz_rate_limiter_key(now.timestamp(), 1)
+
+    def hit(user_id: str, max_hits: int):
+        with client.pipeline(transaction=False) as p:
+            p.lpush(key, now.isoformat())
+            p.expire(key, 1)
+            p.lrange(key, 0, -1)
+            _, _, hits = p.execute()
+
+            if len(hits) > max_hits:
+                raise RateLimitExceededException
+
+    hit(1, 2)
+    hit(1, 2)
+
+    with pytest.raises(RateLimitExceededException):
+        hit(1, 2)

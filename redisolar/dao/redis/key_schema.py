@@ -130,6 +130,10 @@ class KeySchema:
         return "hello"
 
     @prefixed_key
+    def quiz_get_set_key(self) -> str:
+        return "quiz:get-set"
+
+    @prefixed_key
     def quiz_get_members_key(self) -> str:
         return "quiz:get-members"
 
@@ -152,3 +156,7 @@ class KeySchema:
     @prefixed_key
     def quiz_race_condition_key(self) -> str:
         return "quiz:race-condition"
+
+    @prefixed_key
+    def quiz_rate_limiter_key(self, epoch_seconds, user_id) -> str:
+        return f"quiz:limiter:{epoch_seconds}-{user_id}"

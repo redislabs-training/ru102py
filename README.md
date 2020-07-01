@@ -61,13 +61,30 @@ base directory of the project:
 ### Redis
 
 This project requires a connection to Redis. The default settings expect Redis
-to run on localhost at port 6379.
+to run on localhost at port 6379 without password protection.
 
-#### Password protection
+#### Username and password protection
 
-If your Redis instance requires a password, set it with the
-`REDISOLAR_REDIS_PASSWORD` environment variable before running project-related
+If you use Redis with a username (via the new ACL system in Redis 6) and/or a
+password, make sure to set the `REDISOLAR_REDIS_USERNAME` and/or
+`REDISOLAR_REDIS_PASSWORD` environment variables before running project-related
 `make` commands or manual commands.
+
+You can set these on the command-line like so:
+
+  $ REDISOLAR_REDIS_USERNAME=your-username make load
+
+However, doing so keeps a record of these variables around in your shell history.
+
+The example project is configured to read environment variables from a `.env` file,
+so if you do need to use environment variables, we recommend adding them to this file.
+
+*Note*: The .env file is ignored by git because we added it to the `.gitignore`
+file. If you use a `.env` file, you should avoid adding it to git, so your
+credentials don't end up in git's history.
+
+Finally, credential management is a big topic. This is just a demo project --
+make sure you follow your company's guidelines for credentials management.
 
 #### Using a different hostname and/or port for Redis
 
