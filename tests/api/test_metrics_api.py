@@ -42,6 +42,9 @@ def _check_measurements(measurements: List[Measurement], limit: int):
         i -= 1
 
 
+# Callenge #2
+
+@pytest.mark.skip("Remove for challenge #2")
 def _test_insert_and_retrieve(client, readings: List[MeterReading],
                               metric_dao: MetricDaoRedis, limit: int):
     for reading in readings:
@@ -55,6 +58,7 @@ def _test_insert_and_retrieve(client, readings: List[MeterReading],
         _check_measurements(measurements, limit)
 
 
+@pytest.mark.skip("Remove for challenge #2")
 def test_datetime_is_unix_timestamp(metric_dao, client):
     reading = MeterReading(site_id=1,
                            temp_c=1.0,
@@ -72,9 +76,11 @@ def test_datetime_is_unix_timestamp(metric_dao, client):
         and mdt.day == mdt.day and mdt.year == rdt.year
 
 
+@pytest.mark.skip("Remove for challenge #2")
 def test_small(metric_dao, readings, client):
     _test_insert_and_retrieve(client, readings, metric_dao, 1)
 
 
+@pytest.mark.skip("Remove for challenge #2")
 def test_large(metric_dao, readings, client):
     _test_insert_and_retrieve(client, readings, metric_dao, 100)

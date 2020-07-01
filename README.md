@@ -19,7 +19,7 @@ system's package manager, or a manual download before proceeding.
 
 #### Setting default Python 3 version on Ubuntu
 
-If you have multiple versions of Python 3 installed on Ubuntu, you can make /usr/bin/python3 point to Python 3.8 with the following command:
+If you have multiple versions of Python 3 installed on Ubuntu, you can make `/usr/bin/python3` point to Python 3.8 with the following command:
 
     $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/binb/python3.8 1
 
@@ -42,8 +42,8 @@ manually setting up the project is not necessary.
 
 #### Virtualenv
 
-If you want to create a virtualenv manually instead of using `make env`, run
-following command wfrom the base directory of the project:
+If you want to create a virtualenv manually instead of using `make env`, run the
+following command from the base directory of the project:
 
     python3 -m venv env
 
@@ -61,21 +61,38 @@ base directory of the project:
 ### Redis
 
 This project requires a connection to Redis. The default settings expect Redis
-to run on localhost at port 6379.
+to run on localhost at port 6379 without password protection.
 
-#### Password protection
+#### Username and password protection
 
-If your Redis instance requires a password, set it with the
-`REDISOLAR_REDIS_PASSWORD` environment variable before running project-related
+If you use Redis with a username (via the new ACL system in Redis 6) and/or a
+password, make sure to set the `REDISOLAR_REDIS_USERNAME` and/or
+`REDISOLAR_REDIS_PASSWORD` environment variables before running project-related
 `make` commands or manual commands.
+
+You can set these on the command line like so:
+
+    $ REDISOLAR_REDIS_USERNAME=your-username make load
+
+However, doing so keeps a record of these variables around in your shell history.
+
+The example project is configured to read environment variables from a `.env` file,
+so if you do need to use environment variables, we recommend adding them to this file.
+
+*Note*: The `.env` file is ignored by git because we added it to the `.gitignore`
+file. If you use a `.env` file, you should avoid adding it to git, so your
+credentials don't end up in git's history.
+
+Finally, credential management is a big topic. This is just a demo project --
+make sure you follow your company's guidelines for credentials management.
 
 #### Using a different hostname and/or port for Redis
 
 **Important note**: If you are not using Redis on localhost at port 6379, you
 need to update the following files:
 
-- redisolar/instance/dev.cfg
-- redisolar/instance/testing.cfg
+- `redisolar/instance/dev.cfg`
+- `redisolar/instance/testing.cfg`
 
 In the referenced files, change the values of `REDIS_HOST` and `REDIS_PORT` to
 the correct values for your Redis instance.
@@ -92,8 +109,8 @@ tests finish, the test runner deletes all the keys prefixed with "test:".
 You can change the prefix used for keys by changing the `REDIS_KEY_PREFIX`
 option in the following files:
 
-- redisolar/instance/dev.cfg
-- redisolar/instance/testing.cfg
+- `redisolar/instance/dev.cfg`
+- `redisolar/instance/testing.cfg`
 
 ## Loading sample data
 
@@ -112,7 +129,7 @@ If Redis is running on a different host than localhost, or on a different port, 
 Once you've installed the project's Python dependencies, the `load_redisolar`
 command should be available on your command line.
 
-**Tip:**: If the `load_redisolar` command is not available, make sure that you installed the project dependencies (done with `make env`), there were no errors in the `make env` output), nd you've activated the project's virtualenv by running `source env/bin/activate` from the project root.
+**Tip:**: If the `load_redisolar` command is not available, make sure that you installed the project dependencies (done with `make env`), there were no errors in the `make env` output), and you've activated the project's virtualenv by running `source env/bin/activate` from the project root.
 
 `load_redisolar` takes options for host and port, so you can import into a specific host or port by passing those options:
 
@@ -143,8 +160,8 @@ Or supply it on the command line:
 Run the development server with `make dev`.
 
 **Note:** By default, the server runs with geographic features disabled. To run
-with geo features enabled the option `USE_GEO_SITE_API` in
-redisolar/instance/dev.cfg to `True`.
+with geo features enabled, set the option `USE_GEO_SITE_API` in
+`redisolar/instance/dev.cfg` to `True`.
 
 After running `make dev` access https://localhost:8001 to see the app.
 

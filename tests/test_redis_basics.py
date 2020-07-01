@@ -2,24 +2,25 @@ PLANETS = [
     "Mercury", "Mercury", "Venus", "Earth", "Earth", "Mars", "Jupiter", "Saturn",
     "Uranus", "Neptune", "Pluto"
 ]
-PLANETS_LIST_KEY = "ru102py-test:planets:list"
-PLANETS_SET_KEY = "ru102py-test:planets:set"
 EARTH_KEY = "earth"
 
 
-def test_hello(redis):
-    result = redis.set("hello", "world")
-    value = redis.get("hello")
+def test_hello(redis, key_schema):
+    key = key_schema.hello_key()
+    result = redis.set(key, "world")
+    value = redis.get(key)
 
     assert result is True
     assert value == "world"
 
 
-def test_redis_list(redis):
+def test_redis_list(redis, key_schema):
+    key = key_schema.planets_list_key()
+
     assert len(PLANETS) == 11
 
     # Add all test planets to a Redis list
-    result = redis.rpush(PLANETS_LIST_KEY, *PLANETS)
+    result = redis.rpush(key, *PLANETS)
 
     # Check that the length of the list in Redis is the same
     assert result == len(PLANETS)
@@ -27,38 +28,40 @@ def test_redis_list(redis):
     # Get the planets from the list
     # Note: LRANGE is an O(n) command. Be careful running this command
     # with high-cardinality sets.
-    planets = redis.lrange(PLANETS_LIST_KEY, 0, -1)
+    planets = redis.lrange(key, 0, -1)
     assert planets == PLANETS
 
     # Remove the elements that we know are duplicates
     # Note: O(n) operation.
-    redis.lrem(PLANETS_LIST_KEY, 1, "Mercury")
-    redis.lrem(PLANETS_LIST_KEY, 1, "Earth")
+    redis.lrem(key, 1, "Mercury")
+    redis.lrem(key, 1, "Earth")
 
-    planet = redis.rpop(PLANETS_LIST_KEY)
+    planet = redis.rpop(key)
     assert planet == "Pluto"
 
-    assert redis.llen(PLANETS_LIST_KEY) == 8
+    assert redis.llen(key) == 8
 
 
-def test_redis_set(redis):
+def test_redis_set(redis, key_schema):
+    key = key_schema.planets_set_key()
+
     # Add planets to a Redis set
-    redis.sadd(PLANETS_SET_KEY, *PLANETS)
+    redis.sadd(key, *PLANETS)
 
     # Return the cardinality of the set
-    assert redis.scard(PLANETS_SET_KEY) == 9
+    assert redis.scard(key) == 9
 
     # Fetch all values from the set
     # Note: SMEMBERS is an O(n) command. Be careful running this command
     # with high-cardinality sets. Consider SSCAN as an alternative.
-    assert redis.smembers(PLANETS_SET_KEY) == set(PLANETS)
+    assert redis.smembers(key) == set(PLANETS)
 
     # Pluto is, of course, no longer a first-class planet. Remove it.
-    response = redis.srem(PLANETS_SET_KEY, "Pluto")
+    response = redis.srem(key, "Pluto")
     assert response == 1
 
     # Now we have 8 planets, as expected.
-    assert redis.scard(PLANETS_SET_KEY) == 8
+    assert redis.scard(key) == 8
 
 
 def test_redis_hash(redis):

@@ -5,10 +5,12 @@ PORT := 8081
 ifeq (${IS_CI}, true)
 	FLAGS := "--ci"
 else
-	FLAGS := ""
+	FLAGS := "-s"
 endif
 
 .PHONY: mypy test all clean dev load frontend
+
+all: env mypy lint test
 
 env: env/bin/activate
 
@@ -26,8 +28,6 @@ test: env
 
 lint: env
 	. env/bin/activate; pylint redisolar
-
-all: env mypy lint test
 
 clean:
 	rm -rf env

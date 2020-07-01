@@ -9,3 +9,4 @@ hiredis==1.0.1
 click==7.1.1
 redis-py-cluster==2.0.0
 redistimeseries==0.8.0
+python-dotenv==0.13.0

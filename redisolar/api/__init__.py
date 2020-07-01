@@ -13,7 +13,7 @@ from redisolar.api.site import SiteListResource
 from redisolar.api.site import SiteResource
 from redisolar.api.site_geo import SiteGeoListResource
 from redisolar.api.site_geo import SiteGeoResource
-from redisolar.core.connections import get_redis_timeseries_connection
+from redisolar.core.connections import get_redis_connection
 from redisolar.dao import CapacityReportDaoRedis
 from redisolar.dao import FeedDaoRedis
 from redisolar.dao import MeterReadingDaoRedis
@@ -28,8 +28,8 @@ api = Api(blueprint)
 
 def configure(app):
     key_schema = KeySchema(app.config['REDIS_KEY_PREFIX'])
-    redis_client = get_redis_timeseries_connection(app.config['REDIS_HOST'],
-                                                   app.config['REDIS_PORT'])
+    redis_client = get_redis_connection(app.config['REDIS_HOST'],
+                                        app.config['REDIS_PORT'])
 
     try:
         redis_client.ping()
@@ -37,8 +37,8 @@ def configure(app):
         app.logger.error("Redis authentication failed. Make sure you set "
                          "$REDISOLAR_REDIS_PASSWORD to the correct password "
                          "for your Redis instance. Stopping server.")
-        os.kill(os.getpid(), signal.SIGINT)
-
+        raise
+    app.do_teardown_appcontext()
     if app.config.get('USE_GEO_SITE_API'):
         api.add_resource(SiteGeoListResource,
                          '/sites',
