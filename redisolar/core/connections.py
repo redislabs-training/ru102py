@@ -8,28 +8,28 @@ PASSWORD = os.environ.get('REDISOLAR_REDIS_PASSWORD')
 
 
 def get_redis_connection(hostname, port, username=USERNAME, password=PASSWORD):
-    args = {
+    client_kwargs = {
         "host": hostname,
         "port": port,
         "decode_responses": True
     }
     if password:
-        args["password"] = password
+        client_kwargs["password"] = password
     if username:
-        args["username"] = username
+        client_kwargs["username"] = username
 
-    return redis.Redis(**args)
+    return redis.Redis(**client_kwargs)
 
 
 def get_redis_timeseries_connection(hostname, port, username=USERNAME, password=PASSWORD):
-    args = {
+    client_kwargs = {
         "host": hostname,
         "port": port,
         "decode_responses": True
     }
     if password:
-        args["password"] = password
+        client_kwargs["password"] = password
     if username:
-        args["username"] = username
+        client_kwargs["username"] = username
 
-    return Client(**args)
+    return Client(**client_kwargs)
