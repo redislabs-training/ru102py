@@ -3,14 +3,14 @@ import datetime
 from typing import Set
 
 import pytest
-import redis as _redis
 
 from redisolar.dao.base import RateLimitExceededException
 
 
-def test_set_get(key_schema):
+def test_set_get(redis, key_schema):
     key = key_schema.quiz_get_set_key()
-    client = _redis.Redis()
+    client = redis
+    client.connection_pool.connection_kwargs['decode_responses'] = False
     client.set(key, 1.5)
     result = client.get(key)
     assert isinstance(result, bytes)
