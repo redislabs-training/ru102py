@@ -69,17 +69,12 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         # "p" for better performance.
         for site_id in site_ids:
             p.zscore(self.key_schema.capacity_ranking_key(), site_id)
-        site_id_ints = [int(site_id) for site_id in site_ids]
-        scores = dict(zip(site_id_ints, reversed(p.execute())))
+        scores = dict(zip(site_ids, reversed(p.execute())))
         # END Challenge #5
 
-        sites_with_capacity = {
-            site_id for site_id in site_id_ints
-            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD
-        }
-
-        for site_id in sites_with_capacity:
-            p.hgetall(self.key_schema.site_hash_key(site_id))
+        for site_id in site_ids:
+            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD:
+                p.hgetall(self.key_schema.site_hash_key(site_id))
         site_hashes = p.execute()
 
         return {FlatSiteSchema().load(site) for site in site_hashes}
