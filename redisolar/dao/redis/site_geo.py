@@ -1,6 +1,7 @@
 from typing import Set
 
 from redisolar.dao.base import SiteGeoDaoBase
+from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.models import GeoQuery
 from redisolar.models import Site
@@ -33,6 +34,10 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         """Find a Site by ID in Redis."""
         hash_key = self.key_schema.site_hash_key(site_id)
         site_hash = self.redis.hgetall(hash_key)
+
+        if not site_hash:
+            raise SiteNotFound()
+
         return FlatSiteSchema().load(site_hash)
 
     def _find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
@@ -69,17 +74,12 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         # "p" for better performance.
         for site_id in site_ids:
             p.zscore(self.key_schema.capacity_ranking_key(), site_id)
-        site_id_ints = [int(site_id) for site_id in site_ids]
-        scores = dict(zip(site_id_ints, reversed(p.execute())))
+        scores = dict(zip(site_ids, p.execute()))
         # END Challenge #5
 
-        sites_with_capacity = {
-            site_id for site_id in site_id_ints
-            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD
-        }
-
-        for site_id in sites_with_capacity:
-            p.hgetall(self.key_schema.site_hash_key(site_id))
+        for site_id in site_ids:
+            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD:
+                p.hgetall(self.key_schema.site_hash_key(site_id))
         site_hashes = p.execute()
 
         return {FlatSiteSchema().load(site) for site in site_hashes}

@@ -3,6 +3,8 @@ from redisolar.dao.base import MeterReadingDaoBase
 from redisolar.dao.redis.capacity_report import CapacityReportDaoRedis
 from redisolar.dao.redis.feed import FeedDaoRedis
 from redisolar.dao.redis.metric import MetricDaoRedis
+# Challenge #3
+#from redisolar.dao.redis.site_stats import SiteStatsDaoRedis
 from redisolar.dao.redis.base import RedisDaoBase
 
 
@@ -14,4 +16,4 @@ class MeterReadingDaoRedis(MeterReadingDaoBase, RedisDaoBase):
         FeedDaoRedis(self.redis, self.key_schema).insert(meter_reading, **kwargs)
 
         # Challenge #3
-        # SiteStatsDaoRedis(self.redis, self.key_schema).update(meter_reading, **kwargs)
+        #SiteStatsDaoRedis(self.redis, self.key_schema).update(meter_reading, **kwargs)

@@ -2,6 +2,7 @@ from typing import Set
 
 from redisolar.models import Site
 from redisolar.dao.base import SiteDaoBase
+from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.schema import FlatSiteSchema
 
@@ -27,6 +28,10 @@ class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
         """Find a Site by ID in Redis."""
         hash_key = self.key_schema.site_hash_key(site_id)
         site_hash = self.redis.hgetall(hash_key)
+
+        if not site_hash:
+            raise SiteNotFound()
+
         return FlatSiteSchema().load(site_hash)
 
     def find_all(self, **kwargs) -> Set[Site]:

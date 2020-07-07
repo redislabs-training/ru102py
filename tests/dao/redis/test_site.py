@@ -1,5 +1,6 @@
 import pytest
 
+from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis import SiteDaoRedis
 from redisolar.models import Site
 
@@ -7,6 +8,11 @@ from redisolar.models import Site
 @pytest.fixture
 def site_dao(redis, key_schema):
     yield SiteDaoRedis(redis, key_schema)
+
+
+def test_does_not_exist(site_dao):
+    with pytest.raises(SiteNotFound):
+        site_dao.find_by_id(0)
 
 
 def test_insert(redis, site_dao):
