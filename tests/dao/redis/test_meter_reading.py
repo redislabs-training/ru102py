@@ -36,7 +36,7 @@ def test_calls_other_daos(meter_reading_dao):
     mocks = meter_reading_dao['mocks']
 
     # Challenge #3
-    # assert mocks['site_stats'].called is True
+    assert mocks['site_stats'].called is True
     assert mocks['metric'].called is True
     assert mocks['feed'].called is True
     assert mocks['capacity'].called is True

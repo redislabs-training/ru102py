@@ -105,12 +105,12 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
             pipeline = self.redis.pipeline()
 
         # Challenge #2: Uncomment to work on this challenge.
-        #self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
-        #                   MetricUnit.WH_GENERATED, meter_reading.timestamp, pipeline)
-        #self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
-        #                   MetricUnit.WH_USED, meter_reading.timestamp, pipeline)
-        #self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
-        #                   MetricUnit.TEMP_CELSIUS, meter_reading.timestamp, pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
+                           MetricUnit.WH_GENERATED, meter_reading.timestamp, pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
+                           MetricUnit.WH_USED, meter_reading.timestamp, pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
+                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp, pipeline)
 
         if execute:
             pipeline.execute()

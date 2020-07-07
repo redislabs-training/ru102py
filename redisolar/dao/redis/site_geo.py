@@ -51,9 +51,6 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         return {FlatSiteSchema().load(site) for site in sites}
 
     # Challenge #5
-    def _find_by_geo_with_capacity_noop(self, query: GeoQuery) -> Set[Site]:
-        return set()
-
     def _find_by_geo_with_capacity(self, query: GeoQuery, **kwargs) -> Set[Site]:
         # START Challenge #5
         # Your task: Get the sites matching the GEO query.
