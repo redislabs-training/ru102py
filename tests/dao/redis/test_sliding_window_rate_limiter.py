@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from redisolar.dao.redis.sliding_window_rate_limiter import RateLimitExceededException
+from redisolar.dao.base import RateLimitExceededException
 from redisolar.dao.redis.sliding_window_rate_limiter import SlidingWindowRateLimiter
 
 TEN_SECONDS = 10 * 1000
