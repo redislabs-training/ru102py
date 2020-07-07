@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from redisolar.dao.redis import SiteGeoDaoRedis
 from redisolar.dao.redis import CapacityReportDaoRedis
+from redisolar.dao.redis import SiteGeoDaoRedis
 from redisolar.models import Coordinate
 from redisolar.models import GeoQuery
 from redisolar.models import GeoUnit
@@ -187,7 +187,6 @@ def test_find_by_geo_with_excess_capacity(site_geo_dao, capacity_dao):
     sites = site_geo_dao.find_by_geo(query)
     assert len(sites) == 0
 
-
     # Simulate changing a meter reading indicating excess capacity.
     reading = MeterReading(site_id=site1.id,
                            wh_used=1.0,
@@ -195,6 +194,27 @@ def test_find_by_geo_with_excess_capacity(site_geo_dao, capacity_dao):
                            temp_c=10,
                            timestamp=datetime.datetime.now())
     capacity_dao.update(reading)
+
+    # Add more Sites -- none with excess capacity -- to make the test more
+    # realistic.
+    for i in range(2, 20, 1):   # Site 1 is our expected site - skip it!
+        site = Site(id=i,
+             capacity=10,
+             panels=100,
+             address=f"100{i} SE Pine St.",
+             city="Portland",
+             state="OR",
+             postal_code="97202",
+             coordinate=PORTLAND)
+
+        site_geo_dao.insert(site)
+
+        reading = MeterReading(site_id=i,
+                               wh_used=i,
+                               wh_generated=0,
+                               temp_c=10,
+                               timestamp=datetime.datetime.now())
+        capacity_dao.update(reading)
 
     # In this case, one site is returned on the excess capacity query
     sites = site_geo_dao.find_by_geo(query)

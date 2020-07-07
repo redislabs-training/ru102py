@@ -9,6 +9,10 @@ from redisolar.schema import FlatSiteSchema
 CAPACITY_THRESHOLD = 0.2
 
 
+class NotFound(Exception):
+    """A Site with the given ID does not exist."""
+
+
 class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
     """SiteGeoDaoRedis persists and queries Sites in Redis."""
     def insert(self, site: Site, **kwargs):
@@ -33,6 +37,10 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         """Find a Site by ID in Redis."""
         hash_key = self.key_schema.site_hash_key(site_id)
         site_hash = self.redis.hgetall(hash_key)
+
+        if not site_hash:
+            raise NotFound
+
         return FlatSiteSchema().load(site_hash)
 
     def _find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
@@ -69,7 +77,7 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         # "p" for better performance.
         for site_id in site_ids:
             p.zscore(self.key_schema.capacity_ranking_key(), site_id)
-        scores = dict(zip(site_ids, reversed(p.execute())))
+        scores = dict(zip(site_ids, p.execute()))
         # END Challenge #5
 
         for site_id in site_ids:
