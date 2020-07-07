@@ -1,16 +1,13 @@
 from typing import Set
 
 from redisolar.dao.base import SiteGeoDaoBase
+from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.models import GeoQuery
 from redisolar.models import Site
 from redisolar.schema import FlatSiteSchema
 
 CAPACITY_THRESHOLD = 0.2
-
-
-class NotFound(Exception):
-    """A Site with the given ID does not exist."""
 
 
 class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
@@ -39,7 +36,7 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         site_hash = self.redis.hgetall(hash_key)
 
         if not site_hash:
-            raise NotFound
+            raise SiteNotFound()
 
         return FlatSiteSchema().load(site_hash)
 

@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 
+from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis import CapacityReportDaoRedis
 from redisolar.dao.redis import SiteGeoDaoRedis
 from redisolar.models import Coordinate
@@ -22,6 +23,11 @@ def site_geo_dao(redis, key_schema):
 @pytest.fixture
 def capacity_dao(redis, key_schema):
     yield CapacityReportDaoRedis(redis, key_schema)
+
+
+def test_does_not_exist(site_geo_dao):
+    with pytest.raises(SiteNotFound):
+        site_geo_dao.find_by_id(0)
 
 
 def test_insert(redis, site_geo_dao):
@@ -197,15 +203,15 @@ def test_find_by_geo_with_excess_capacity(site_geo_dao, capacity_dao):
 
     # Add more Sites -- none with excess capacity -- to make the test more
     # realistic.
-    for i in range(2, 20, 1):   # Site 1 is our expected site - skip it!
+    for i in range(2, 20, 1):  # Site 1 is our expected site - skip it!
         site = Site(id=i,
-             capacity=10,
-             panels=100,
-             address=f"100{i} SE Pine St.",
-             city="Portland",
-             state="OR",
-             postal_code="97202",
-             coordinate=PORTLAND)
+                    capacity=10,
+                    panels=100,
+                    address=f"100{i} SE Pine St.",
+                    city="Portland",
+                    state="OR",
+                    postal_code="97202",
+                    coordinate=PORTLAND)
 
         site_geo_dao.insert(site)
 

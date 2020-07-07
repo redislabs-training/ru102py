@@ -12,6 +12,10 @@ from redisolar.models import Site
 from redisolar.models import SiteStats
 
 
+class SiteNotFound(Exception):
+    """A Site with the given ID does not exist."""
+
+
 class SiteDaoBase(abc.ABC):
     @abc.abstractmethod
     def insert(self, site: Site, **kwargs) -> None:
