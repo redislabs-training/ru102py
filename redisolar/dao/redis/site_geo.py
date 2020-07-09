@@ -1,3 +1,5 @@
+from typing import Dict
+from typing import List
 from typing import Set
 
 from redisolar.dao.base import SiteGeoDaoBase
@@ -55,6 +57,8 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         # Your task: Get the sites matching the GEO query.
         # END Challenge #5
 
+        p = self.redis.pipeline(transaction=False)
+
         # START Challenge #5
         #
         # Your task: Populate a dictionary called "scores" whose keys are site
@@ -62,11 +66,17 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         #
         # Make sure to run any Redis commands against a Pipeline object
         # for better performance.
-
-        # Delete the next line when you have populated a site_hashes
-        # variable.
-        site_hashes = []  # type: ignore
         # END Challenge #5
+
+        # Delete the next lines after you've populated a `site_ids`
+        # and `scores` variable.
+        site_ids: List[str] = []
+        scores: Dict[str, float] = {}
+
+        for site_id in site_ids:
+            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD:
+                p.hgetall(self.key_schema.site_hash_key(site_id))
+        site_hashes = p.execute()
 
         return {FlatSiteSchema().load(site) for site in site_hashes}
 
