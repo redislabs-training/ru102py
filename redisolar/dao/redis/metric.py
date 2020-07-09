@@ -117,8 +117,8 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
     def insert_metric(self, site_id: int, value: float, unit: MetricUnit,
                       time: datetime.datetime, pipeline: redis.client.Pipeline):
         """Insert a specific metric."""
-        metric_key = self.key_schema.day_metric_key(site_id, unit, time)
-        minute_of_day = self._get_day_minute(time)
+        metric_key = self.key_schema.day_metric_key(site_id, unit, time)  # pylint: disable=unused-variable
+        minute_of_day = self._get_day_minute(time) # pylint: disable=unused-variable
 
         # START Challenge #2
         # END Challenge #2
