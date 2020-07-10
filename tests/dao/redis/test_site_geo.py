@@ -161,6 +161,7 @@ def test_find_sites_by_geo(site_geo_dao):
     assert site_geo_dao.find_by_geo(query) == {site1, site2}
 
 
+@pytest.mark.skip("Remove for challenge #5")
 def test_find_by_geo_with_excess_capacity(site_geo_dao, capacity_dao):
     site1 = Site(id=1,
                  capacity=10.0,

@@ -104,26 +104,24 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
             execute = True
             pipeline = self.redis.pipeline()
 
-        # Challenge #2: Uncomment to work on this challenge.
-        #self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
-        #                   MetricUnit.WH_GENERATED, meter_reading.timestamp, pipeline)
-        #self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
-        #                   MetricUnit.WH_USED, meter_reading.timestamp, pipeline)
-        #self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
-        #                   MetricUnit.TEMP_CELSIUS, meter_reading.timestamp, pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.wh_generated,
+                           MetricUnit.WH_GENERATED, meter_reading.timestamp, pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.wh_used,
+                           MetricUnit.WH_USED, meter_reading.timestamp, pipeline)
+        self.insert_metric(meter_reading.site_id, meter_reading.temp_c,
+                           MetricUnit.TEMP_CELSIUS, meter_reading.timestamp, pipeline)
 
         if execute:
             pipeline.execute()
 
-    # Challenge #2
     def insert_metric(self, site_id: int, value: float, unit: MetricUnit,
                       time: datetime.datetime, pipeline: redis.client.Pipeline):
-        metric_key = self.key_schema.day_metric_key(site_id, unit, time)
-        minute_of_day = self._get_day_minute(time)
+        """Insert a specific metric."""
+        metric_key = self.key_schema.day_metric_key(site_id, unit, time)  # pylint: disable=unused-variable
+        minute_of_day = self._get_day_minute(time) # pylint: disable=unused-variable
 
-        pipeline.zadd(metric_key,
-                      {str(MeasurementMinute(value, minute_of_day)): minute_of_day})
-        pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
+        # START Challenge #2
+        # END Challenge #2
 
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
                    limit: int, **kwargs) -> Deque[Measurement]:
