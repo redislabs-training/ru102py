@@ -1,6 +1,10 @@
 APP := redisolar
 PORT := 8081
+PYTHON3_8 := $(shell command -v python3.8 2> /dev/null)
 
+ifndef PYTHON3_8
+    $(error "Python 3.8 is not installed! See README.md")
+endif
 
 ifeq (${IS_CI}, true)
 	FLAGS := "--ci"
@@ -8,15 +12,14 @@ else
 	FLAGS := "-s"
 endif
 
-.PHONY: mypy test all clean dev load frontend
+.PHONY: mypy test all clean dev load frontend timeseries-docker
 
 all: env mypy lint test
 
 env: env/bin/activate
 
 env/bin/activate: requirements.txt
-	@python3 --version | grep 3.8; if [ $$? -eq 1 ]; then echo "python3 does not point to Python 3.8. Please fix! See README.md." && exit 1; fi
-	test -d env || python3 -m venv env
+	test -d env || python3.8 -m venv env
 	. env/bin/activate; pip install wheel; pip install -Ue ".[dev]"
 	touch env/bin/activate
 
@@ -44,3 +47,6 @@ frontend: env
 
 load: env
 	. env/bin/activate; FLASK_APP=$(APP) flask load
+
+timeseries-docker:
+	docker run -p 6379:6379 -it -d --rm redislabs/redistimeseries
