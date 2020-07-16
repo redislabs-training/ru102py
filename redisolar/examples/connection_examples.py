@@ -24,13 +24,17 @@ def connection_examples():
     # Run read operations with the slave.
     slave.get("foo")
 
-
     # Connect to a Redis Cluster deployment.
-    # Note: This requires a separate library built on top of redis-py,
-    # called redis-py-cluster.
-    startup_nodes = [{"host": "127.0.0.1", "port": "7000"}]
-    cluster = RedisCluster(startup_nodes=startup_nodes, decode_responses=True)
+    #
+    # NOTE: This requires a separate library built on top of redis-py, called
+    # redis-py-cluster. At the time we built this course, redis-py-cluster
+    # depended on too old a version of redis-py for us to include it as a
+    # dependency in this project, so we've commented out the example.
+    #
+    # from rediscluster import RedisCluster
+    # startup_nodes = [{"host": "127.0.0.1", "port": "7000"}]
+    # cluster = RedisCluster(startup_nodes=startup_nodes, decode_responses=True)
 
     # Read and write through the cluster client.
-    cluster.set("foo", "bar")
-    cluster.get("foo")
+    # cluster.set("foo", "bar")
+    # cluster.get("foo")
