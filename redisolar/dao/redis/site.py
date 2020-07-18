@@ -1,10 +1,9 @@
-from typing import Set
-
-from redisolar.models import Site
 from redisolar.dao.base import SiteDaoBase
 from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis.base import RedisDaoBase
+from redisolar.models import Site
 from redisolar.schema import FlatSiteSchema
+from typing import Set
 
 
 class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
@@ -36,7 +35,30 @@ class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
 
     def find_all(self, **kwargs) -> Set[Site]:
         """Find all Sites in Redis."""
-        # Challenge #1
+        # Challenge #1 solution.
+        site_hashes = []
+        site_ids_key = self.key_schema.site_ids_key()
+        site_ids = self.redis.smembers(site_ids_key)
+
+        for site_id in site_ids:
+            key = self.key_schema.site_hash_key(site_id)
+            site_hashes.append(self.redis.hgetall(key))
+
+        return {FlatSiteSchema().load(site_hash) for site_hash in site_hashes}
+
+    def find_all_pipeline(self, **kwargs) -> Set[Site]:
+        """Find all Sites in Redis using a pipeline.
+
+        Alternative Challenge #1 solution: pipelines.
+        ---------------------------------------------
+        We haven't introduced pipelines yet, so feel free to come back to this
+        section next week. However, note that with enough latency between you
+        and your Redis server, the solution code included this week will be
+        unusably slow.
+
+        The "correct" way to make many requests to Redis is to use a pipeline.
+        The following alternative implementation of find_all() does just that.
+        """
         site_ids_key = self.key_schema.site_ids_key()
         site_ids = self.redis.smembers(site_ids_key)
 
