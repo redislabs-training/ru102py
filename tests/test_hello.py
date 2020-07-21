@@ -23,7 +23,7 @@ def redis_connection(app):
     yield redis.Redis(**client_kwargs)
 
 
-def test_hello(redis_connection):
+def test_say_hello(redis_connection):
     result = redis_connection.set("hello", "world")
     value = redis_connection.get("hello")
     assert result is True
