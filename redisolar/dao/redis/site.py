@@ -1,9 +1,10 @@
+from typing import Set
+
 from redisolar.dao.base import SiteDaoBase
 from redisolar.dao.base import SiteNotFound
 from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.models import Site
 from redisolar.schema import FlatSiteSchema
-from typing import Set
 
 
 class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
