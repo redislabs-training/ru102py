@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List
 from typing import Union
+from typing import Any
 
 import marshmallow
 from marshmallow_dataclass import NewType
@@ -18,18 +19,19 @@ def deserialize_timestamp(v: str) -> datetime.datetime:
     return datetime.datetime.fromtimestamp(safe_v)
 
 
-def serialize_timestamp(val: Union[float, datetime.datetime]) -> float:
+def serialize_timestamp(val: Any) -> str:
     """
-    Serialize a value to a timestamp (a float).
+    Serialize a value to a UNIX timestamp.
 
-    If the object looks like a datetime.datetime object and has a
-    'timestamp' method, call that method to obtain the timestamp.
+    If the object has a 'timestamp' method, call that method
+    to obtain the timestamp.
 
-    Otherwise, we assume the value is already a timestamp.
+    Otherwise, assume the value is already a timestamp.
     """
-    if hasattr(val, 'timestamp'):
+    try:
         return val.timestamp()
-    return val
+    except AttributeError:
+        return str(val)
 
 
 class DateTime(marshmallow.fields.DateTime):
@@ -44,6 +46,20 @@ class DateTime(marshmallow.fields.DateTime):
     DESERIALIZATION_FUNCS = marshmallow.fields.DateTime.DESERIALIZATION_FUNCS.copy()
     SERIALIZATION_FUNCS['timestamp'] = serialize_timestamp
     DESERIALIZATION_FUNCS['timestamp'] = deserialize_timestamp
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        """
+        When we serialize a UNIX timestamp, return it as a float.
+
+        Without doing this, we'd return UNIX timestamps as strings, which
+        isn't quite what we want.
+        """
+        result = super()._serialize(value, attr, obj, **kwargs)
+        data_format = self.format or self.DEFAULT_FORMAT
+
+        if data_format == 'timestamp':
+            return float(result)
+        return result
 
 
 # A field that serializes datetime objects as UNIX timestamps.
