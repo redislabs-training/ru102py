@@ -18,6 +18,20 @@ def deserialize_timestamp(v: str) -> datetime.datetime:
     return datetime.datetime.fromtimestamp(safe_v)
 
 
+def serialize_timestamp(val: Union[float, datetime.datetime]) -> float:
+    """
+    Serialize a value to a timestamp (a float).
+
+    If the object looks like a datetime.datetime object and has a
+    'timestamp' method, call that method to obtain the timestamp.
+
+    Otherwise, we assume the value is already a timestamp.
+    """
+    if hasattr(val, 'timestamp'):
+        return val.timestamp()
+    return val
+
+
 class DateTime(marshmallow.fields.DateTime):
     """
     Extend DateTime support to add a "timestamp" format.
@@ -28,7 +42,7 @@ class DateTime(marshmallow.fields.DateTime):
 
     SERIALIZATION_FUNCS = marshmallow.fields.DateTime.SERIALIZATION_FUNCS.copy()
     DESERIALIZATION_FUNCS = marshmallow.fields.DateTime.DESERIALIZATION_FUNCS.copy()
-    SERIALIZATION_FUNCS['timestamp'] = lambda x: x.timestamp()
+    SERIALIZATION_FUNCS['timestamp'] = serialize_timestamp
     DESERIALIZATION_FUNCS['timestamp'] = deserialize_timestamp
 
 

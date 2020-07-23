@@ -1,10 +1,11 @@
 import datetime
 from typing import Generator
-from typing import List
+from typing import List, Deque
 
 import pytest
+from collections import deque
 
-from redisolar.dao.redis import MetricDaoRedis
+from redisolar.dao.redis import MetricDaoRedisTimeseries
 from redisolar.models import Measurement
 from redisolar.models import MeterReading
 from redisolar.schema import MeasurementSchema
@@ -14,16 +15,16 @@ NOW = datetime.datetime.utcnow()
 
 
 @pytest.fixture
-def metric_dao(redis, key_schema):
-    yield MetricDaoRedis(redis, key_schema)
+def metric_dao(redis_timeseries, key_schema):
+    yield MetricDaoRedisTimeseries(redis_timeseries, key_schema)
 
 
 @pytest.fixture
-def readings(metric_dao) -> Generator[List[MeterReading], None, None]:
-    readings = []
+def readings(metric_dao) -> Generator[Deque[MeterReading], None, None]:
+    readings: deque = deque()
     time = NOW
     for i in range(72 * 60):
-        readings.append(
+        readings.appendleft(
             MeterReading(site_id=1,
                          temp_c=i * 1.0,
                          wh_used=i * 1.0,
@@ -42,9 +43,9 @@ def _check_measurements(measurements: List[Measurement], limit: int):
         i -= 1
 
 
-# Callenge #2
+# Challenge #2
 def _test_insert_and_retrieve(client, readings: List[MeterReading],
-                              metric_dao: MetricDaoRedis, limit: int):
+                              metric_dao: MetricDaoRedisTimeseries, limit: int):
     for reading in readings:
         metric_dao.insert(reading)
 
