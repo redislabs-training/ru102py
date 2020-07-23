@@ -7,8 +7,8 @@ from flask import current_app
 
 from redisolar.core import get_redis_connection
 from redisolar.core import SampleDataGenerator  # pylint: disable=unused-import
-from redisolar.dao import SiteDaoRedis
-from redisolar.dao import SiteGeoDaoRedis
+from redisolar.dao.redis import SiteDaoRedis
+from redisolar.dao.redis import SiteGeoDaoRedis
 from redisolar.schema import FlatSiteSchema
 from redisolar.dao.redis.key_schema import KeySchema
 

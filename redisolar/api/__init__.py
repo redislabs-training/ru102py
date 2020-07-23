@@ -14,12 +14,12 @@ from redisolar.api.site import SiteResource
 from redisolar.api.site_geo import SiteGeoListResource
 from redisolar.api.site_geo import SiteGeoResource
 from redisolar.core.connections import get_redis_timeseries_connection
-from redisolar.dao import CapacityReportDaoRedis
-from redisolar.dao import FeedDaoRedis
-from redisolar.dao import MeterReadingDaoRedis
-from redisolar.dao import MetricDaoRedisTimeseries
-from redisolar.dao import SiteDaoRedis
-from redisolar.dao import SiteGeoDaoRedis
+from redisolar.dao.redis import CapacityReportDaoRedis
+from redisolar.dao.redis import FeedDaoRedis
+from redisolar.dao.redis import MeterReadingDaoRedis
+from redisolar.dao.redis import MetricDaoRedisTimeseries
+from redisolar.dao.redis import SiteDaoRedis
+from redisolar.dao.redis import SiteGeoDaoRedis
 from redisolar.dao.redis.key_schema import KeySchema
 
 blueprint = Blueprint("api", __name__)

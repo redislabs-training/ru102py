@@ -1,11 +1,11 @@
 from redisolar.models import MeterReading
 from redisolar.dao.base import MeterReadingDaoBase
+from redisolar.dao.redis.base import RedisDaoBase
 from redisolar.dao.redis.capacity_report import CapacityReportDaoRedis
 from redisolar.dao.redis.feed import FeedDaoRedis
 from redisolar.dao.redis.metric_timeseries import MetricDaoRedisTimeseries
 # Challenge #3
 from redisolar.dao.redis.site_stats import SiteStatsDaoRedis
-from redisolar.dao.redis.base import RedisDaoBase
 
 
 class MeterReadingDaoRedis(MeterReadingDaoBase, RedisDaoBase):
