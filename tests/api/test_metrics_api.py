@@ -1,4 +1,6 @@
 import datetime
+from collections import deque
+from typing import Deque
 from typing import Generator
 from typing import List
 
@@ -19,11 +21,11 @@ def metric_dao(redis, key_schema):
 
 
 @pytest.fixture
-def readings(metric_dao) -> Generator[List[MeterReading], None, None]:
-    readings = []
+def readings(metric_dao) -> Generator[Deque[MeterReading], None, None]:
+    readings: deque = deque()
     time = NOW
     for i in range(72 * 60):
-        readings.append(
+        readings.appendleft(
             MeterReading(site_id=1,
                          temp_c=i * 1.0,
                          wh_used=i * 1.0,
