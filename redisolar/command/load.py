@@ -5,7 +5,7 @@ import click
 from progress.bar import Bar
 from flask import current_app
 
-from redisolar.core import get_redis_connection
+from redisolar.core import get_redis_timeseries_connection
 from redisolar.core import SampleDataGenerator  # pylint: disable=unused-import
 from redisolar.dao.redis import SiteDaoRedis
 from redisolar.dao.redis import SiteGeoDaoRedis
@@ -34,7 +34,7 @@ def load(filename, delete_keys):
     port = conf['REDIS_PORT']
     key_prefix = conf['REDIS_KEY_PREFIX']
     key_schema = KeySchema(key_prefix)
-    client = get_redis_connection(hostname=hostname, port=port)
+    client = get_redis_timeseries_connection(hostname=hostname, port=port)
     site_dao = SiteDaoRedis(client, key_schema)
     site_geo_dao = SiteGeoDaoRedis(client, key_schema)
 
