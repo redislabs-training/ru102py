@@ -55,8 +55,7 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
         # e.g.: metrics:whU:2020-01-01:1
         key = self.key_schema.day_metric_key(site_id, unit, date)
 
-        # Use negative indexes to get `count` number of items from the end
-        # of the sorted set.
+        # Get `count` number of items from the end of the sorted set.
         metrics = self.redis.zrevrange(key, 0, count - 1, withscores=True)
 
         for metric in metrics:
