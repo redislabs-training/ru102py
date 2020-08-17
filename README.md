@@ -12,7 +12,7 @@ To start and run this application, you will need:
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
 * Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redislabs.com/redistimeseries/#setup
 
-**Note**: If you don't have Redis installed but do have Docker and want to get start quickly,
+**Note**: If you don't have Redis installed but do have Docker and want to get started quickly,
 run `make timeseries-docker`. This starts a Redis container with RedisTimeSeries installed.
 
 ### Setting up Python dependencies with make
