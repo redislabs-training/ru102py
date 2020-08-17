@@ -8,7 +8,8 @@ This is the sample application codebase for the Redis University course [RU102PY
 
 To start and run this application, you will need:
 
-* [Python 3.8](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
+* [Python 
+](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
 * Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redislabs.com/redistimeseries/#setup
 
@@ -194,6 +195,12 @@ You can run `make test` to run the unit tests. Doing so will build
 a virtualenv automatically if you have not already done so.
 
 ## FAQ
+
+## Why do I get a "Python 3.8 is not installed!" error when I try to run `make` commands?
+
+This project requires Python 3.8. See the "Prerequisites" section of this README.
+You will need to install Python 3.8 on your machine, or else use our "lab" Docker image --
+see the "Setup" tab in the course for more details.
 
 ## Why do I get a ConnectionError when I run the tests or dev server?
 
