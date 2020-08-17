@@ -8,8 +8,7 @@ This is the sample application codebase for the Redis University course [RU102PY
 
 To start and run this application, you will need:
 
-* [Python 
-](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
+* [Python](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
 * Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redislabs.com/redistimeseries/#setup
 
