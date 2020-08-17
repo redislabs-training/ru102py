@@ -18,3 +18,5 @@ npm-debug.log
 .idea/
 
 .env
+
+.DS_Store
