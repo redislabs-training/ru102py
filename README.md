@@ -73,12 +73,13 @@ You can set these on the command line like so:
 
 However, doing so keeps a record of these variables around in your shell history.
 
-The example project is configured to read environment variables from a `.env` file,
-so if you do need to use environment variables, we recommend adding them to this file.
+The example project is configured to read environment variables from a `.env`
+file, so if you do need to use environment variables, we recommend adding them
+to this file.
 
-*Note*: The `.env` file is ignored by git because we added it to the `.gitignore`
-file. If you use a `.env` file, you should avoid adding it to git, so your
-credentials don't end up in git's history.
+*Note*: The `.env` file is ignored by git because we added it to the
+`.gitignore` file. If you use a `.env` file, you should avoid adding it to git,
+so your credentials don't end up in git's history.
 
 Finally, credential management is a big topic. This is just a demo project --
 make sure you follow your company's guidelines for credentials management.
@@ -113,46 +114,13 @@ option in the following files:
 
 Before the example app will do anything interesting, it needs data.
 
-### With make
+You can use the command `make load` to load solar sites and generate example
+readings. `make load` loads data into the Redis instance that you configured in
+`redisolar/instance/dev.cfg`, using the `REDIS_HOST` and `REDIS_PORT` defined there.
 
-If you're running Redis locally, you can use the command `make load` to load
-sample data. `make load` loads data into a Redis running on localhost at port
-6379.
-
-### Manually
-
-If Redis is running on a different host than localhost, or on a different port, use the `load_redisolar` command to load data.
-
-Once you've installed the project's Python dependencies, the `load_redisolar`
-command should be available on your command line.
-
-**Tip:**: If the `load_redisolar` command is not available, make sure that you installed the project dependencies (done with `make env`), there were no errors in the `make env` output), and you've activated the project's virtualenv by running `source env/bin/activate` from the project root.
-
-`load_redisolar` takes options for host and port, so you can import into a specific host or port by passing those options:
-
-    load_redisolar --host 192.168.1.9 --port 16379
-
-The command will populate solar sites and generate example readings.
-
-### Password protection
-
-If your Redis instance is password-protected, pass the `-w/--request-password` option to
-make `load_redisolar` ask you interactively for the password.
-
-To send the password to `load_redisolar` non-interactively, set the
-`REDISOLAR_REDIS_PASSWORD` environment variable.
-
-In most Unix shells, you can set an env var using `export`:
-
-    export REDISOLAR_REDIS_PASSWORD=password
-
-Or supply it on the command line:
-
-    REDISOLAR_REDIS_PASSWORD=password load_redisolar --host 192.168.1.9
+**Note**: Read through the "Redis" section in this README to make sure you've properly configured the sample application to connect to Redis before you load sample data.
 
 ## Running the dev server
-
-### With make
 
 Run the development server with `make dev`.
 
@@ -162,23 +130,38 @@ with geo features enabled, set the option `USE_GEO_SITE_API` in
 
 After running `make dev` access https://localhost:8001 to see the app.
 
-### Manually
+### Running Manually
 
-You can use the `flask` command to run the dev server manually, like so:
+If you need to override command-line flags when running Flask, you can use the `flask` command to run the dev server manually.
 
-    FLASK_APP=redisolar flask run --port=8001
+To do, first activate the project's virtual environment:
 
-### Password protection
+    $ source env/bin/activate
 
+Then can run the `flask` command:
 
-If your Redis instance requires a password, set it using the
-`REDISOLAR_REDIS_PASSWORD` environment variable.
-
-See instructions in the "Password protection" section of the previous
-instructions on loading sample data for more information on setting environment
-variables.
-
+    $ FLASK_APP=redisolar flask run --port=8001
+    
 ## Running tests
 
 You can run `make test` to run the unit tests. Doing so will build
 a virtualenv automatically if you have not already done so.
+
+### Manually
+
+You can run individual tests by calling `pytest` manually. To do, first activate the project's virtual environment:
+
+    $ source env/bin/activate
+    
+Then run `pytest` with whatever options you want. For example, here is how you
+run a specific test:
+
+    $ pytest -k test_set_get
+
+## Questions?
+
+Chat with our teaching assistants on the [Redis University Discord Server](https://discord.gg/k5wr43E).
+
+## License
+
+This project is released under the MIT license. See LICENSE for the full text.

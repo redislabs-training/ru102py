@@ -28,10 +28,5 @@ setuptools.setup(
     install_requires=install_requires,
     extras_require={
         "dev": dev_requires
-    },
-    entry_points={
-        "console_scripts": [
-            "load_redisolar = redisolar.command.load:load"
-        ]
     }
 )
