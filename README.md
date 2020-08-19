@@ -77,12 +77,13 @@ You can set these on the command line like so:
 
 However, doing so keeps a record of these variables around in your shell history.
 
-The example project is configured to read environment variables from a `.env` file,
-so if you do need to use environment variables, we recommend adding them to this file.
+The example project is configured to read environment variables from a `.env`
+file, so if you do need to use environment variables, we recommend adding them
+to this file.
 
-*Note*: The `.env` file is ignored by git because we added it to the `.gitignore`
-file. If you use a `.env` file, you should avoid adding it to git, so your
-credentials don't end up in git's history.
+*Note*: The `.env` file is ignored by git because we added it to the
+`.gitignore` file. If you use a `.env` file, you should avoid adding it to git,
+so your credentials don't end up in git's history.
 
 Finally, credential management is a big topic. This is just a demo project --
 make sure you follow your company's guidelines for credentials management.
@@ -101,7 +102,8 @@ the correct values for your Redis instance.
 #### Key prefixes
 
 This project prefixes all keys with a string. By default, the dev server and
-sample data loader use the prefix "ru102py-app:", while the test suite uses "ru102py-test:".
+sample data loader use the prefix "ru102py-app:", while the test suite uses
+"ru102py-test:".
 
 When you run the tests, they add keys to the same Redis database that the
 running Flask application uses, but with the prefix "test:". Then when the
@@ -117,46 +119,13 @@ option in the following files:
 
 Before the example app will do anything interesting, it needs data.
 
-### With make
+You can use the command `make load` to load solar sites and generate example
+readings. `make load` loads data into the Redis instance that you configured in
+`redisolar/instance/dev.cfg`, using the `REDIS_HOST` and `REDIS_PORT` defined there.
 
-If you're running Redis locally, you can use the command `make load` to load
-sample data. `make load` loads data into a Redis running on localhost at port
-6379.
-
-### Manually
-
-If Redis is running on a different host than localhost, or on a different port, use the `load_redisolar` command to load data.
-
-Once you've installed the project's Python dependencies, the `load_redisolar`
-command should be available on your command line.
-
-**Tip:**: If the `load_redisolar` command is not available, make sure that you installed the project dependencies (done with `make env`), there were no errors in the `make env` output), and you've activated the project's virtualenv by running `source env/bin/activate` from the project root.
-
-`load_redisolar` takes options for host and port, so you can import into a specific host or port by passing those options:
-
-    load_redisolar --host 192.168.1.9 --port 16379
-
-The command will populate solar sites and generate example readings.
-
-### Password protection
-
-If your Redis instance is password-protected, pass the `-w/--request-password` option to
-make `load_redisolar` ask you interactively for the password.
-
-To send the password to `load_redisolar` non-interactively, set the
-`REDISOLAR_REDIS_PASSWORD` environment variable.
-
-In most Unix shells, you can set an env var using `export`:
-
-    export REDISOLAR_REDIS_PASSWORD=password
-
-Or supply it on the command line:
-
-    REDISOLAR_REDIS_PASSWORD=password load_redisolar --host 192.168.1.9
+**Note**: Read through the "Redis" section in this README to make sure you've properly configured the sample application to connect to Redis before you load sample data.
 
 ## Running the dev server
-
-### With make
 
 Run the development server with `make dev`.
 
@@ -167,55 +136,76 @@ with geo features enabled, set the option `USE_GEO_SITE_API` in
 After running `make dev` access https://localhost:8001 to see the app.
 
 **Don't see any data?**
-The first time you run `make dev`, you may see a map with nothing on it. In order to see
-sites on the map, you'll need to do two things:
+The first time you run `make dev`, you may see a map with nothing on it. In
+order to see sites on the map, you'll need to do two things:
 
 1. Follow the instructions in this README to load data
 2. Complete Challenge #1 in the course
 
-### Manually Running the Dev Server
+### Running the dev server manually
 
-You can use the `flask` command to run the dev server manually, like so:
+If you need to override command-line flags when running Flask, you can use the `flask` command to run the dev server manually.
 
-    FLASK_APP=redisolar flask run --port=8001
+To do, first activate the project's virtual environment:
 
-### Password protection
+    $ source env/bin/activate
 
-If your Redis instance requires a password, set it using the
-`REDISOLAR_REDIS_PASSWORD` environment variable.
+Then run the `flask` command:
 
-See instructions in the "Password protection" section of the previous
-instructions on loading sample data for more information on setting environment
-variables.
-
+    $ FLASK_APP=redisolar flask run --port=8001
+    
 ## Running tests
 
 You can run `make test` to run the unit tests. Doing so will build
 a virtualenv automatically if you have not already done so.
 
+### Running tests manually
+
+You can run individual tests by calling `pytest` manually. To do, first activate the project's virtual environment:
+
+    $ source env/bin/activate
+    
+Then run `pytest` with whatever options you want. For example, here is how you
+run a specific test:
+
+    $ pytest -k test_set_get
+
 ## FAQ
 
-## Why do I get a "Python 3.8 is not installed!" error when I try to run `make` commands?
+### Why do I get a "Python 3.8 is not installed!" error when I try to run `make` commands?
 
-This project requires Python 3.8. See the "Prerequisites" section of this README.
-You will need to install Python 3.8 on your machine, or else use our "lab" Docker image --
-see the "Setup" tab in the course for more details.
+This project requires Python 3.8. See the "Prerequisites" section of this
+README. You will need to install Python 3.8 on your machine, or else use our
+"lab" Docker image -- see the "Setup" tab in the course for more details.
 
-## Why do I get a ConnectionError when I run the tests or dev server?
+### Why do I get a ConnectionError when I run the tests or dev server?
 
-You might see an error like this (or many of them) when you try to run the tests:
+You might see an error like this (or many of them) when you try to run the
+tests:
 
     ERROR tests/scripts/test_update_if_lowest.py::test_update_if_lowest_unchanged - redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
    
-The error is telling you that Redis is not running on port 6379. Make sure you've started Redis -- exactly how to do so depends
-on your operation system and the way you installed Redis. For example, if you installed via Homebrew on a Mac, the command is:
+The error is telling you that Redis is not running on port 6379. Make sure
+you've started Redis -- exactly how to do so depends on your operation system
+and the way you installed Redis. For example, if you installed via Homebrew on a
+Mac, the command is:
 
     brew services start redis 
    
-## Why do I get an "Authentication required" error when I try to run the tests/dev server?
+### Why do I get an "Authentication required" error when I try to run the tests/dev server?
 
-Your Redis instance requires a username and/or password to connect. First, find out what those are. Then follow the "Username and password protection" section of this README to configure the project to connect with those credentials.
+Your Redis instance requires a username and/or password to connect. First, find
+out what those are. Then follow the "Username and password protection" section
+of this README to configure the project to connect with those credentials.
 
-## Why do I get an "unknown command `TS.ADD`" when I try to run the tests?
+### Why do I get an "unknown command `TS.ADD`" when I try to run the tests?
 
 Your Redis instance does not have the RedisTimeSeries module installed. See the section "RedisTimeSeries" in this README for instructions.
+
+## Questions?
+
+Chat with our teaching assistants on the [Redis University Discord Server](https://discord.gg/k5wr43E).
+
+## License
+
+This project is released under the MIT license. See LICENSE for the full text.
