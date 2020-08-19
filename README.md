@@ -8,13 +8,16 @@ This is the sample application codebase for the Redis University course [RU102PY
 
 To start and run this application, you will need:
 
-* [Python 3.8](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
+* [Python](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
 * Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redislabs.com/redistimeseries/#setup
 
+**Note**: If you don't have Redis installed but do have Docker and want to get started quickly,
+run `make timeseries-docker`. This starts a Redis container with RedisTimeSeries installed.
+
 ### Setting up Python dependencies with make
 
-redisolar-py automates setting up the Python dependencies with `make`.
+This project automates setting up its Python dependencies with `make`.
 
 To get started, run `make env`. This command creates a virtual environment
 and installs the project and its dependencies into the environment.
@@ -32,7 +35,7 @@ manually setting up the project is not necessary.
 If you want to create a virtualenv manually instead of using `make env`, run the
 following command from the base directory of the project:
 
-    python3 -m venv env
+    python3.8 -m venv env
 
 #### Dependencies
 
@@ -57,8 +60,9 @@ or run Redis with the module enabled using Docker.
 
 Check the project's web site for installation instructions: https://oss.redislabs.com/redistimeseries/
 
-To get started quickly, run `make timeseries-docker`, which starts a Docker
-container running Redis with the RedisTimeSeries module enabled.
+**Note**: As mentioned earlier in this document, if you have Docker installed and want to get started quickly, run
+`make timeseries-docker`, which starts a Docker container running Redis with the
+RedisTimeSeries module enabled.
 
 #### Username and password protection
 
@@ -98,7 +102,8 @@ the correct values for your Redis instance.
 #### Key prefixes
 
 This project prefixes all keys with a string. By default, the dev server and
-sample data loader use the prefix "ru102py-app:", while the test suite uses "ru102py-test:".
+sample data loader use the prefix "ru102py-app:", while the test suite uses
+"ru102py-test:".
 
 When you run the tests, they add keys to the same Redis database that the
 running Flask application uses, but with the prefix "test:". Then when the
@@ -130,7 +135,14 @@ with geo features enabled, set the option `USE_GEO_SITE_API` in
 
 After running `make dev` access https://localhost:8001 to see the app.
 
-### Running Manually
+**Don't see any data?**
+The first time you run `make dev`, you may see a map with nothing on it. In
+order to see sites on the map, you'll need to do two things:
+
+1. Follow the instructions in this README to load data
+2. Complete Challenge #1 in the course
+
+### Running the dev server manually
 
 If you need to override command-line flags when running Flask, you can use the `flask` command to run the dev server manually.
 
@@ -138,7 +150,7 @@ To do, first activate the project's virtual environment:
 
     $ source env/bin/activate
 
-Then can run the `flask` command:
+Then run the `flask` command:
 
     $ FLASK_APP=redisolar flask run --port=8001
     
@@ -147,7 +159,7 @@ Then can run the `flask` command:
 You can run `make test` to run the unit tests. Doing so will build
 a virtualenv automatically if you have not already done so.
 
-### Manually
+### Running tests manually
 
 You can run individual tests by calling `pytest` manually. To do, first activate the project's virtual environment:
 
@@ -157,6 +169,38 @@ Then run `pytest` with whatever options you want. For example, here is how you
 run a specific test:
 
     $ pytest -k test_set_get
+
+## FAQ
+
+### Why do I get a "Python 3.8 is not installed!" error when I try to run `make` commands?
+
+This project requires Python 3.8. See the "Prerequisites" section of this
+README. You will need to install Python 3.8 on your machine, or else use our
+"lab" Docker image -- see the "Setup" tab in the course for more details.
+
+### Why do I get a ConnectionError when I run the tests or dev server?
+
+You might see an error like this (or many of them) when you try to run the
+tests:
+
+    ERROR tests/scripts/test_update_if_lowest.py::test_update_if_lowest_unchanged - redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+   
+The error is telling you that Redis is not running on port 6379. Make sure
+you've started Redis -- exactly how to do so depends on your operation system
+and the way you installed Redis. For example, if you installed via Homebrew on a
+Mac, the command is:
+
+    brew services start redis 
+   
+### Why do I get an "Authentication required" error when I try to run the tests/dev server?
+
+Your Redis instance requires a username and/or password to connect. First, find
+out what those are. Then follow the "Username and password protection" section
+of this README to configure the project to connect with those credentials.
+
+### Why do I get an "unknown command `TS.ADD`" when I try to run the tests?
+
+Your Redis instance does not have the RedisTimeSeries module installed. See the section "RedisTimeSeries" in this README for instructions.
 
 ## Questions?
 
