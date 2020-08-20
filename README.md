@@ -133,7 +133,7 @@ Run the development server with `make dev`.
 with geo features enabled, set the option `USE_GEO_SITE_API` in
 `redisolar/instance/dev.cfg` to `True`.
 
-After running `make dev` access https://localhost:8001 to see the app.
+After running `make dev` access https://localhost:8081 to see the app.
 
 **Don't see any data?**
 The first time you run `make dev`, you may see a map with nothing on it. In
