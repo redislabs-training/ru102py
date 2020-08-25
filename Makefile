@@ -50,3 +50,6 @@ load: env
 
 timeseries-docker:
 	docker run -p 6379:6379 -it -d --rm redislabs/redistimeseries
+
+timeseries-podman:
+	podman run -p=127.0.0.1:6379:6379 -it -d --rm redislabs/redistimeseries
