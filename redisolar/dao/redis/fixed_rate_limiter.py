@@ -63,7 +63,7 @@ class FixedRateLimiter(RateLimiterDaoBase, RedisDaoBase):
 
     def hit(self, name: str) -> None:
         key = self._get_key(name)
-        pipeline = self.redis.pipeline()
+        pipeline = self.redis.pipeline(transaction=False)
 
         pipeline.incr(key)
         pipeline.expire(key, self.expiration)
