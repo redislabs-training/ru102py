@@ -27,7 +27,7 @@ def test_redis_list(redis, key_schema):
 
     # Get the planets from the list
     # Note: LRANGE is an O(n) command. Be careful running this command
-    # with high-cardinality sets.
+    # with large lists.
     planets = redis.lrange(key, 0, -1)
     assert planets == PLANETS
 
