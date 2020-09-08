@@ -6,7 +6,8 @@ from redisolar.dao.redis.metric import MetricDaoRedis
 from redisolar.models import MeterReading
 
 # Uncomment for Challenge #3
-# from redisolar.dao.redis import SiteStatsDaoRedis
+# from redisolar.dao.redis.site_stats import SiteStatsDaoRedis
+
 
 
 class MeterReadingDaoRedis(MeterReadingDaoBase, RedisDaoBase):
