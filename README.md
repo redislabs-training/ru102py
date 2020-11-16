@@ -15,6 +15,11 @@ To start and run this application, you will need:
 **Note**: If you don't have Redis installed but do have Docker or Podman and want to get started quickly,
 run `make timeseries-docker` or `make timeseries-podman`. This starts a Redis container with RedisTimeSeries installed. (Podman is a Docker replacement for Fedora users.)
 
+If you're using Windows, check out the following resources for help with running Redis:
+
+* [Redis Labs Blog - Running Redis on Windows 10](https://redislabs.com/blog/redis-on-windows-10/)
+* [Microsoft - Windows Subsystem for Linux Installation Guide for Windows 10](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+
 ### Setting up Python dependencies with make
 
 This project automates setting up its Python dependencies with `make`.
