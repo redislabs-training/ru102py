@@ -4,8 +4,6 @@
 #
 #    pip-compile requirements.in
 #
--e file:///Users/andrewbrookins/src/ru102py
-    # via -r requirements.in
 aniso8601==8.1.1
     # via flask-restful
 cffi==1.14.4

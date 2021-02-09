@@ -52,7 +52,7 @@ Install the app and its dependencies by running the following commands from the
 base directory of the project:
 
     pip install --upgrade pip
-    pip install wheel pip-tools
+    pip install wheel pip-tools -e .
     pip-sync requirements.txt requirements-dev.txt
 
 ### Redis
