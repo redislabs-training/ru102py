@@ -48,10 +48,12 @@ Before installing dependencies, activate the virtualenv:
 
     source env/bin/activate
 
-Install the app and its dependencies by running the following command from the
+Install the app and its dependencies by running the following commands from the
 base directory of the project:
 
-    pip install -e .
+    pip install --upgrade pip
+    pip install wheel pip-tools
+    pip-sync requirements.txt requirements-dev.txt
 
 ### Redis
 
@@ -158,7 +160,7 @@ To do, first activate the project's virtual environment:
 Then run the `flask` command:
 
     $ FLASK_APP=redisolar flask run --port=8001
-    
+
 ## Running tests
 
 You can run `make test` to run the unit tests. Doing so will build
@@ -169,7 +171,7 @@ a virtualenv automatically if you have not already done so.
 You can run individual tests by calling `pytest` manually. To do, first activate the project's virtual environment:
 
     $ source env/bin/activate
-    
+
 Then run `pytest` with whatever options you want. For example, here is how you
 run a specific test:
 
@@ -189,14 +191,14 @@ You might see an error like this (or many of them) when you try to run the
 tests:
 
     ERROR tests/scripts/test_update_if_lowest.py::test_update_if_lowest_unchanged - redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
-   
+
 The error is telling you that Redis is not running on port 6379. Make sure
 you've started Redis -- exactly how to do so depends on your operation system
 and the way you installed Redis. For example, if you installed via Homebrew on a
 Mac, the command is:
 
-    brew services start redis 
-   
+    brew services start redis
+
 ### Why do I get an "Authentication required" error when I try to run the tests/dev server?
 
 Your Redis instance requires a username and/or password to connect. First, find

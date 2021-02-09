@@ -20,7 +20,7 @@ env: env/bin/activate
 
 env/bin/activate: requirements.txt
 	test -d env || python3.8 -m venv env
-	. env/bin/activate; pip install --upgrade pip; pip install pip-tools wheel; pip-sync requirements.txt requirements-dev.txt; pip install -e .
+	. env/bin/activate; pip install --upgrade pip; pip install pip-tools wheel; pip-sync requirements.txt requirements-dev.txt
 	touch env/bin/activate
 
 mypy: env
