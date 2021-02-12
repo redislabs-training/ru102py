@@ -75,7 +75,7 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         # END Challenge #5
 
         for site_id in site_ids:
-            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD:
+            if scores[site_id] > CAPACITY_THRESHOLD:
                 p.hgetall(self.key_schema.site_hash_key(site_id))
         site_hashes = p.execute()
 
