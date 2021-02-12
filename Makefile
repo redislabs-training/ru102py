@@ -12,7 +12,7 @@ else
 	FLAGS := "-s"
 endif
 
-.PHONY: mypy test all clean dev load frontend timeseries-docker
+.PHONY: mypy test all clean dev load frontend timeseries-docker deps
 
 all: env mypy lint test
 
@@ -20,7 +20,7 @@ env: env/bin/activate
 
 env/bin/activate: requirements.txt
 	test -d env || python3.8 -m venv env
-	. env/bin/activate; pip install wheel; pip install -Ue ".[dev]"
+	. env/bin/activate; pip install --upgrade pip; pip install pip-tools wheel -e .; pip-sync requirements.txt requirements-dev.txt
 	touch env/bin/activate
 
 mypy: env
@@ -38,6 +38,14 @@ clean:
 
 dev: env
 	. env/bin/activate; FLASK_ENV=development FLASK_APP=$(APP) FLASK_DEBUG=1 flask run --port=$(PORT) --host=0.0.0.0
+
+requirements.txt: requirements.in
+	pip-compile requirements.in > requirements.txt
+
+requirements-dev.txt: requirements-dev.in
+	pip-compile requirements-dev.in > requirements-dev.txt
+
+deps: requirements-dev.txt requirements.txt
 
 frontend: env
 	cd frontend; npm run build
