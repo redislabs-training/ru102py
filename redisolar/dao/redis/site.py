@@ -63,7 +63,7 @@ class SiteDaoRedis(SiteDaoBase, RedisDaoBase):
         site_ids_key = self.key_schema.site_ids_key()
         site_ids = self.redis.smembers(site_ids_key)
 
-        p = self.redis.pipeline()
+        p = self.redis.pipeline(transaction=False)
         for site_id in site_ids:
             key = self.key_schema.site_hash_key(site_id)
             p.hgetall(key)
