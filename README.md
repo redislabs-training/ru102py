@@ -100,8 +100,8 @@ make sure you follow your company's guidelines for credentials management.
 **Important note**: If you are not using Redis on localhost at port 6379, you
 need to update the following files:
 
-- `redisolar/instance/dev.cfg`
-- `redisolar/instance/testing.cfg`
+- `ru102py/instance/dev.cfg`
+- `ru102py/instance/testing.cfg`
 
 In the referenced files, change the values of `REDIS_HOST` and `REDIS_PORT` to
 the correct values for your Redis instance.
@@ -119,8 +119,8 @@ tests finish, the test runner deletes all the keys prefixed with "test:".
 You can change the prefix used for keys by changing the `REDIS_KEY_PREFIX`
 option in the following files:
 
-- `redisolar/instance/dev.cfg`
-- `redisolar/instance/testing.cfg`
+- `ru102py/instance/dev.cfg`
+- `ru102py/instance/testing.cfg`
 
 ## Loading sample data
 
@@ -128,7 +128,7 @@ Before the example app will do anything interesting, it needs data.
 
 You can use the command `make load` to load solar sites and generate example
 readings. `make load` loads data into the Redis instance that you configured in
-`redisolar/instance/dev.cfg`, using the `REDIS_HOST` and `REDIS_PORT` defined there.
+`ru102py/instance/dev.cfg`, using the `REDIS_HOST` and `REDIS_PORT` defined there.
 
 **Note**: Read through the "Redis" section in this README to make sure you've properly configured the sample application to connect to Redis before you load sample data.
 
@@ -138,7 +138,7 @@ Run the development server with `make dev`.
 
 **Note:** By default, the server runs with geographic features disabled. To run
 with geo features enabled, set the option `USE_GEO_SITE_API` in
-`redisolar/instance/dev.cfg` to `True`.
+`ru102py/instance/dev.cfg` to `True`.
 
 After running `make dev` access https://localhost:8081 to see the app.
 
