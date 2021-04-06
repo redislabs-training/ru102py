@@ -16,14 +16,22 @@ cached-property==1.5.2
     # via aspy.refactor-imports
 certifi==2020.12.5
     # via requests
+cffi==1.14.5
+    # via cryptography
 chardet==4.0.0
     # via requests
+cryptography==3.4.7
+    # via secretstorage
 docutils==0.16
     # via readme-renderer
 idna==2.10
     # via requests
 isort==4.3.21
     # via pylint
+jeepney==0.6.0
+    # via
+    #   keyring
+    #   secretstorage
 keyring==22.0.1
     # via twine
 lazy-object-proxy==1.4.3
@@ -46,6 +54,8 @@ pluggy==0.13.1
     # via pytest
 py==1.10.0
     # via pytest
+pycparser==2.20
+    # via cffi
 pygments==2.7.4
     # via readme-renderer
 pylint==2.4.4
@@ -70,6 +80,8 @@ requests==2.25.1
     # via
     #   requests-toolbelt
     #   twine
+secretstorage==3.3.1
+    # via keyring
 six==1.15.0
     # via
     #   astroid
@@ -83,7 +95,7 @@ typed-ast==1.4.2
     # via mypy
 typing-extensions==3.7.4.3
     # via mypy
-urllib3==1.26.3
+urllib3==1.26.4
     # via requests
 wcwidth==0.2.5
     # via pytest
