@@ -14,7 +14,7 @@ click==7.1.1
     #   flask
 cryptography==3.3.2
     # via -r requirements.in
-flask-cors==3.0.8
+flask-cors==3.0.9
     # via -r requirements.in
 flask-restful==0.3.8
     # via -r requirements.in
