@@ -213,6 +213,10 @@ Your Redis instance does not have the RedisTimeSeries module installed. See the 
 
 Chat with our teaching assistants on the [Redis University Discord Server](https://discord.gg/k5wr43E).
 
+## Subscribe to our YouTube Channel
+
+Want to see more? [Subscribe to our YouTube channel](https://youtube.com/redislabs) for regular Redis uploads!
+
 ## License
 
 This project is released under the MIT license. See LICENSE for the full text.
