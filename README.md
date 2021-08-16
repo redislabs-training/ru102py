@@ -1,6 +1,6 @@
 # RediSolar Python
 
-This is the sample application codebase for the Redis University course [RU102PY, Redis for Python Developers](https://university.redislabs.com/courses/ru102py/).
+This is the sample application codebase for the Redis University course [RU102PY, Redis for Python Developers](https://university.redis.com/courses/ru102py/).
 
 ## Setup
 
@@ -10,14 +10,14 @@ To start and run this application, you will need:
 
 * [Python 3.8](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
-* Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redislabs.com/redistimeseries/#setup
+* Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redis.com/redistimeseries/#setup
 
 **Note**: If you don't have Redis installed but do have Docker or Podman and want to get started quickly,
 run `make timeseries-docker` or `make timeseries-podman`. This starts a Redis container with RedisTimeSeries installed. (Podman is a Docker replacement for Fedora users.)
 
 If you're using Windows, check out the following resources for help with running Redis:
 
-* [Redis Labs Blog - Running Redis on Windows 10](https://redislabs.com/blog/redis-on-windows-10/)
+* [Redis Labs Blog - Running Redis on Windows 10](https://redis.com/blog/redis-on-windows-10/)
 * [Microsoft - Windows Subsystem for Linux Installation Guide for Windows 10](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
 
 ### Setting up Python dependencies with make
@@ -65,7 +65,7 @@ to run on localhost at port 6379 without password protection.
 This project uses the RedisTimeSeries module. You can either install it manually
 or run Redis with the module enabled using Docker.
 
-Check the project's web site for installation instructions: https://oss.redislabs.com/redistimeseries/
+Check the project's web site for installation instructions: https://oss.redis.com/redistimeseries/
 
 **Note**: As mentioned earlier in this document, if you have Docker installed and want to get started quickly, run
 `make timeseries-docker`, which starts a Docker container running Redis with the
@@ -215,7 +215,7 @@ Chat with our teaching assistants on the [Redis University Discord Server](https
 
 ## Subscribe to our YouTube Channel
 
-Want to see more? [Subscribe to our YouTube channel](https://youtube.com/redislabs) for regular Redis uploads!
+Want to see more? [Subscribe to our YouTube channel](https://youtube.com/redisinc) for regular Redis uploads!
 
 ## License
 
