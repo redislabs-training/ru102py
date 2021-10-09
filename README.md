@@ -4,6 +4,8 @@ This is the sample application codebase for the Redis University course [RU102PY
 
 ## Setup
 
+![Preview of running application - Solar Site Map with markers](preview.png)
+
 ### Prerequisites
 
 To start and run this application, you will need:
