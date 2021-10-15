@@ -10,3 +10,5 @@ services:
     container_name: redis
     image: redislabs/redistimeseries
     restart: always
+    volumes:
+      - ./redisdata:/data
