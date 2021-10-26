@@ -9,4 +9,7 @@ services:
   redis:
     container_name: redis
     image: redislabs/redistimeseries
-    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redisdata:/data
