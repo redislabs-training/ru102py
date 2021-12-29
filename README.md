@@ -10,7 +10,7 @@ This is the sample application codebase for the Redis University course [RU102PY
 
 To start and run this application, you will need:
 
-* [Python 3.8](https://www.python.org/downloads/) (**Note**: It must be version 3.8)
+* [Python 3.8 or higher](https://www.python.org/downloads/) (**Note**: It must be version 3.8 or higher)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer
 * Your Redis installation should have the RedisTimeSeries module installed. You can find the installation instructions at: https://oss.redis.com/redistimeseries/#setup
 
@@ -43,6 +43,8 @@ If you want to create a virtualenv manually instead of using `make env`, run the
 following command from the base directory of the project:
 
     python3.8 -m venv env
+
+Substitute `python3.8` for your version of Python if you're running Python 3.9 or 3.10.
 
 #### Dependencies
 
