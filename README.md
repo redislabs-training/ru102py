@@ -215,9 +215,9 @@ Your Redis instance does not have the RedisTimeSeries module installed. See the 
 
 Chat with our teaching assistants on the [Redis University Discord Server](https://discord.gg/k5wr43E).
 
-## Subscribe to our YouTube Channel
+## Subscribe to our YouTube Channel / Follow us on Twitch
 
-Want to see more? [Subscribe to our YouTube channel](https://youtube.com/redisinc) for regular Redis uploads!
+We'd love for you to [check out our YouTube channel](https://youtube.com/redisinc), and subscribe if you want to see more Redis videos!  We also stream regularly on our [Twitch.tv channel](https://www.twitch.tv/redisinc) - follow us to be notified when we're live.
 
 ## License
 
