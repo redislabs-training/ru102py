@@ -1,9 +1,23 @@
 APP := redisolar
 PORT := 8081
-PYTHON3_8 := $(shell command -v python3.8 2> /dev/null)
+VALID_PYTHON_FOUND := $(shell command -v python3.8 2> /dev/null)
+ifndef VALID_PYTHON_FOUND
+    VALID_PYTHON_FOUND := $(shell command -v python3.9 2> /dev/null)
+    PYTHON_COMMAND := "python3.9"
+else
+    PYTHON_COMMAND := "python3.8"
+endif
+ifndef VALID_PYTHON_FOUND
+    VALID_PYTHON_FOUND := $(shell command -v python3.10 2> /dev/null)
+    PYTHON_COMMAND := "python3.10"
+endif
+ifndef VALID_PYTHON_FOUND
+    VALID_PYTHON_FOUND := $(shell command -v python3.11 2> /dev/null)
+    PYTHON_COMMAND := "python3.11"
+endif
 
-ifndef PYTHON3_8
-    $(error "Python 3.8 is not installed! See README.md")
+ifndef VALID_PYTHON_FOUND
+    $(error "Python 3.8-11 is not installed! See README.md")
 endif
 
 ifeq (${IS_CI}, true)
@@ -19,7 +33,7 @@ all: env mypy lint test
 env: env/bin/activate
 
 env/bin/activate: requirements.txt
-	test -d env || python3.8 -m venv env
+	test -d env || ${PYTHON_COMMAND} -m venv env
 	. env/bin/activate; pip install --upgrade pip; pip install pip-tools wheel -e .; pip-sync requirements.txt requirements-dev.txt
 	touch env/bin/activate
 
