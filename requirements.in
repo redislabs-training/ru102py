@@ -9,4 +9,4 @@ hiredis==1.0.1
 click==7.1.1
 redistimeseries==0.8.0
 python-dotenv==0.15.0
-cryptography<3.4  # Last version without a Rust dependency
+cryptography<39.1  # Last version without a Rust dependency
