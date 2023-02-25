@@ -2,6 +2,32 @@
 
 This is the sample application codebase for the Redis University course [RU102PY, Redis for Python Developers](https://university.redis.com/courses/ru102py/).
 
+- [RediSolar Python](#redisolar-python)
+  - [Setup](#setup)
+    - [Prerequisites](#prerequisites)
+    - [Setting up Python dependencies with make](#setting-up-python-dependencies-with-make)
+    - [Setting up dependencies manually](#setting-up-dependencies-manually)
+      - [Virtualenv](#virtualenv)
+      - [Dependencies](#dependencies)
+    - [Redis](#redis)
+      - [RedisTimeSeries](#redistimeseries)
+      - [Username and password protection](#username-and-password-protection)
+      - [Using a different hostname and/or port for Redis](#using-a-different-hostname-andor-port-for-redis)
+      - [Key prefixes](#key-prefixes)
+  - [Loading sample data](#loading-sample-data)
+  - [Running the dev server](#running-the-dev-server)
+    - [Running the dev server manually](#running-the-dev-server-manually)
+  - [Running tests](#running-tests)
+    - [Running tests manually](#running-tests-manually)
+  - [FAQ](#faq)
+    - [Why do I get a "Python 3.8 is not installed!" error when I try to run `make` commands?](#why-do-i-get-a-python-38-is-not-installed-error-when-i-try-to-run-make-commands)
+    - [Why do I get a ConnectionError when I run the tests or dev server?](#why-do-i-get-a-connectionerror-when-i-run-the-tests-or-dev-server)
+    - [Why do I get an "Authentication required" error when I try to run the tests/dev server?](#why-do-i-get-an-authentication-required-error-when-i-try-to-run-the-testsdev-server)
+    - [Why do I get an "unknown command `TS.ADD`" when I try to run the tests?](#why-do-i-get-an-unknown-command-tsadd-when-i-try-to-run-the-tests)
+  - [Questions?](#questions)
+  - [Subscribe to our YouTube Channel / Follow us on Twitch](#subscribe-to-our-youtube-channel--follow-us-on-twitch)
+  - [License](#license)
+
 ## Setup
 
 ![Preview of running application - Solar Site Map with markers](preview.png)
