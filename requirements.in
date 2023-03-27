@@ -1,5 +1,5 @@
 Flask==1.1.1
-redis==3.5.0
+redis==4.5.3
 progress==1.5
 Flask-RESTful==0.3.8
 webargs==6.0.0
