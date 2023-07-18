@@ -51,7 +51,7 @@ class SiteStatsDaoRedis(SiteStatsDaoBase, RedisDaoBase):
 
         max_capacity = self.redis.hget(key, SiteStats.MAX_CAPACITY)
         if not max_capacity or reading.current_capacity > float(max_capacity):
-            self.redis.hset(key, SiteStats.MAX_CAPACITY, reading.wh_generated)
+            self.redis.hset(key, SiteStats.MAX_CAPACITY, reading.current_capacity)
 
     def _update_optimized(self, key: str, meter_reading: MeterReading,
                           pipeline: redis.client.Pipeline = None) -> None:
