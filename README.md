@@ -179,6 +179,12 @@ run a specific test:
 
     $ pytest -k test_set_get
 
+## Optional (but Recommended): RedisInsight
+
+RedisInsight is a graphical tool for viewing data in Redis and managing Redis server instances.  You don't need to install it to be successful with this course, but we recommend it as a good way of viewing data stored in Redis.
+
+To use RedisInsight, you'll need to [download it](https://redis.io/docs/ui/insight/) then point it at your Redis instance.  Check out the [RedisInsight documentation](https://redis.io/docs/ui/insight/) for help.
+
 ## FAQ
 
 ### Why do I get a "Python 3.8 is not installed!" error when I try to run `make` commands?
