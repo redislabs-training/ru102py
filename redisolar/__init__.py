@@ -13,6 +13,15 @@ def create_app(config_file=DEV_CONFIG):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_pyfile(config_file)
 
+    # Override configuration with environment variables if they exist
+    redis_host = os.environ.get('REDIS_HOST')
+    if redis_host:
+        app.config['REDIS_HOST'] = redis_host
+
+    redis_port = os.environ.get('REDIS_PORT')
+    if redis_port:
+        app.config['REDIS_PORT'] = redis_port
+
     app.register_blueprint(api.blueprint)
     api.configure(app)
 
