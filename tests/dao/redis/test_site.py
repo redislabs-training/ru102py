@@ -42,7 +42,7 @@ def test_insert_many(site_dao):
                  panels=110,
                  address="101 SW Ankeny",
                  city="Portland",
-                 state="OR",
+                 state="OR",``
                  postal_code="97203")
 
     site3 = Site(id=3,
@@ -76,7 +76,7 @@ def test_find_by_id_existing_site(site_dao):
     assert found_site == site
 
 
-@pytest.mark.skip("Remove for challenge #1")
+# @pytest.mark.skip("Remove for challenge #1")
 def test_find_all(site_dao):
     site1 = Site(id=1,
                  capacity=10.0,
