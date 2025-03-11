@@ -116,11 +116,20 @@ class MetricDaoRedis(MetricDaoBase, RedisDaoBase):
     def insert_metric(self, site_id: int, value: float, unit: MetricUnit,
                       time: datetime.datetime, pipeline: redis.client.Pipeline):
         """Insert a specific metric."""
-        metric_key = self.key_schema.day_metric_key(site_id, unit, time)  # pylint: disable=unused-variable
-        minute_of_day = self._get_day_minute(time) # pylint: disable=unused-variable
+        metric_key = self.key_schema.day_metric_key(site_id, unit, time)
+        minute_of_day = self._get_day_minute(time)
 
-        # START Challenge #2
-        # END Challenge #2
+        # Create a MeasurementMinute object to encode measurement + minute into a single string.
+        mm = MeasurementMinute(value, minute_of_day)
+        
+        # Add to the sorted set:
+        # - member is the string representation of MeasurementMinute (e.g. "18.00:120")
+        # - score is the integer minute of the day (e.g. 120 for 2:00 am)
+        pipeline.zadd(metric_key, {str(mm): minute_of_day})
+        
+        # Optionally set an expiration to clean up older data:
+        pipeline.expire(metric_key, METRIC_EXPIRATION_SECONDS)
+
 
     def get_recent(self, site_id: int, unit: MetricUnit, time: datetime.datetime,
                    limit: int, **kwargs) -> Deque[Measurement]:
