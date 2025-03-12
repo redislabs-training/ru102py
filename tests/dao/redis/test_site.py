@@ -42,7 +42,7 @@ def test_insert_many(site_dao):
                  panels=110,
                  address="101 SW Ankeny",
                  city="Portland",
-                 state="OR",``
+                 state="OR",
                  postal_code="97203")
 
     site3 = Site(id=3,

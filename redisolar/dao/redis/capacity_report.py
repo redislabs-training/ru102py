@@ -33,8 +33,8 @@ class CapacityReportDaoRedis(CapacityDaoBase, RedisDaoBase):
         return CapacityReport(high_capacity_list, low_capacity_list)
 
     def get_rank(self, site_id: int, **kwargs) -> float:
-        # START Challenge #4
-        # Remove the following line after you have added code to
-        # get the real rank.
-        return 0
-        # END Challenge #4
+        capacity_ranking_key = self.key_schema.capacity_ranking_key()
+        rank = self.redis.zrevrank(capacity_ranking_key, site_id)
+        # If the site_id is not found in the sorted set, rank will be None.
+        # You can choose how to handle that case. Here, we simply return -1.
+        return rank if rank is not None else -1
