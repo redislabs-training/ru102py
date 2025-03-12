@@ -54,14 +54,32 @@ class SiteStatsDaoRedis(SiteStatsDaoBase, RedisDaoBase):
             self.redis.hset(key, SiteStats.MAX_CAPACITY, reading.wh_generated)
 
     def _update_optimized(self, key: str, meter_reading: MeterReading,
-                          pipeline: redis.client.Pipeline = None) -> None:
+                      pipeline: redis.client.Pipeline = None) -> None:
         execute = False
         if pipeline is None:
             pipeline = self.redis.pipeline()
             execute = True
 
-        # START Challenge #3
-        # END Challenge #3
+        # Set the reporting time, increment count, and set the expiry.
+        reporting_time = datetime.datetime.utcnow().isoformat()
+        pipeline.hset(key, SiteStats.LAST_REPORTING_TIME, reporting_time)
+        pipeline.hincrby(key, SiteStats.COUNT, 1)
+        pipeline.expire(key, WEEK_SECONDS)
+
+        # Use the Lua script to update MAX_WH only if the new wh_generated is greater.
+        self.compare_and_update_script.update_if_greater(
+            pipeline, key, SiteStats.MAX_WH, meter_reading.wh_generated
+        )
+
+        # Use the Lua script to update MIN_WH only if the new wh_generated is lower.
+        self.compare_and_update_script.update_if_less(
+            pipeline, key, SiteStats.MIN_WH, meter_reading.wh_generated
+        )
+
+        # Use the Lua script to update MAX_CAPACITY only if the new current_capacity is greater.
+        self.compare_and_update_script.update_if_greater(
+            pipeline, key, SiteStats.MAX_CAPACITY, meter_reading.current_capacity
+        )
 
         if execute:
             pipeline.execute()
