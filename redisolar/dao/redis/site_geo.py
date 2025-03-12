@@ -53,32 +53,37 @@ class SiteGeoDaoRedis(SiteGeoDaoBase, RedisDaoBase):
         return {FlatSiteSchema().load(site) for site in sites}
 
     def _find_by_geo_with_capacity(self, query: GeoQuery, **kwargs) -> Set[Site]:
-        # START Challenge #5
-        # Your task: Get the sites matching the GEO query.
-        # END Challenge #5
-
-        p = self.redis.pipeline(transaction=False)
-
-        # START Challenge #5
-        #
-        # Your task: Populate a dictionary called "scores" whose keys are site
-        # IDs and whose values are the site's capacity.
-        #
-        # Make sure to run any Redis commands against a Pipeline object
-        # for better performance.
-        # END Challenge #5
-
-        # Delete the next lines after you've populated a `site_ids`
-        # and `scores` variable.
-        site_ids: List[str] = []
-        scores: Dict[str, float] = {}
-
+        # STEP 1: Use Redis GEO command to find site IDs within the specified radius.
+        site_ids: List[str] = self.redis.georadius(
+            self.key_schema.site_geo_key(),
+            query.coordinate.lng,
+            query.coordinate.lat,
+            query.radius,
+            query.radius_unit.value
+        )
+        
+        # STEP 2: For each site in the geo query, retrieve its capacity.
+        # Site capacity is stored in a Sorted Set under the key provided by capacity_ranking_key().
+        capacity_key = self.key_schema.capacity_ranking_key()
+        score_pipe = self.redis.pipeline(transaction=False)
         for site_id in site_ids:
-            if scores[site_id] and scores[site_id] > CAPACITY_THRESHOLD:
+            score_pipe.zscore(capacity_key, site_id)
+        score_results = score_pipe.execute()
+        
+        # Build a dictionary mapping site IDs to their capacity (default to 0.0 if missing).
+        scores: Dict[str, float] = {}
+        for site_id, score in zip(site_ids, score_results):
+            scores[str(site_id)] = float(score) if score is not None else 0.0
+
+        # Now, use a pipeline to fetch the full site hash for those sites that exceed the capacity threshold.
+        p = self.redis.pipeline(transaction=False)
+        for site_id in site_ids:
+            if scores.get(str(site_id), 0.0) > CAPACITY_THRESHOLD:
                 p.hgetall(self.key_schema.site_hash_key(site_id))
         site_hashes = p.execute()
 
-        return {FlatSiteSchema().load(site) for site in site_hashes}
+        # Return a set of Site objects built from the hashes.
+        return {FlatSiteSchema().load(site) for site in site_hashes if site}
 
     def find_by_geo(self, query: GeoQuery, **kwargs) -> Set[Site]:
         """Find Sites using a geographic query."""
