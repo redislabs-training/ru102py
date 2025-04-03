@@ -1,6 +1,6 @@
 # RediSolar Python
 
-This is the sample application codebase for the Redis University course [RU102PY, Redis for Python Developers](https://university.redis.com/courses/ru102py/).
+This is the sample application codebase for RU102PY, [Redis for Python Developers](https://university.redis.io/learningpath/ikoq5va7id3qko) on [Redis University](https://university.redis.com).
 
 ## Setup
 
@@ -179,7 +179,7 @@ run a specific test:
 
     $ pytest -k test_set_get
 
-## Optional (but Recommended): RedisInsight
+## Optional (But recommended): RedisInsight
 
 RedisInsight is a graphical tool for viewing data in Redis and managing Redis server instances.  You don't need to install it to be successful with this course, but we recommend it as a good way of viewing data stored in Redis.
 
